@@ -9,7 +9,21 @@ export default {
   name: "Mapcontainer",
   data() {
     return {
-      count: 0
+      count: 0,
+      /*地图对象*/
+      map: {},
+      /*驾车规划*/
+      AMap_Driving: {
+        /*驾车规划配置*/
+        config: {
+          policy: AMap.DrivingPolicy.LEAST_TIME,
+          map: this.map,
+          hideMarkers: true,
+          autoFitView: false
+        },
+        /*规划对象*/
+        maker: {}
+      }
     };
   },
   mounted: function() {
@@ -18,8 +32,13 @@ export default {
       resizeEnable: true,
       zoom: 11,
       center: [116.397428, 39.90923],
-      mapStyle:'amap://styles/fe7d1f157e05c97d6930995928e4f39d'
+      mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
+    this.map = map;
+
+    /*驾车换乘对象*/
+    let driving = new AMap.Driving(this.AMap_Driving.config);
+    this.AMap_Driving.maker = driving;
 
     /*绑定热点单击事件*/
     let that = this;
@@ -38,7 +57,7 @@ export default {
     /**
      * @description 创建点击热点信息窗体
      * @param {AMP click event} event 点击地图触发的事件对象
-    */
+     */
     createInfoWindow: function(event) {
       let infoDiv = document.createElement("div");
       let InfoWindowDemo =
@@ -57,16 +76,67 @@ export default {
       //绑定点击加号的事件
       let that = this;
       infoDiv.querySelector("#infoAction").onclick = function(e) {
-        that.addPOIFromMap(event.id);
+        that.addPOIToData(event);
       };
       return infoDiv;
     },
     /**
      * @description 增加POI到总列表
-     * @param {POI id} id 高德地图POI.id
-    */
-    addPOIFromMap:function(id){
+     * @param {POI event} event 事件obj
+     */
+    addPOIToData: function(event) {
+      /*校验是否已存在id*/
+      let pois = this.$store.state.POIs;
+      for (let i = 0; i < pois.length; i++) {
+        for (let j = 0; j < pois[i].length; j++) {
+          if (pois[i][j].id == event.id) return; //existed
+        }
+      }
 
+      let that = this;
+      /*生成marker*/
+      let marker = new AMap.Marker({
+        map: that.map,
+        position: event.lnglat,
+        animation: "AMAP_ANIMATION_DROP",
+        title: event.name
+      });
+      marker.show();
+
+      /*生成换乘*/
+      let _pois = this.$store.state.POIs[this.$store.state.nowDay];
+      let transfer = {
+        type: "driving",
+        plan: {}
+      };
+      let payload = {
+        id: event.id,
+        marker: marker,
+        transfer: transfer
+      };
+      if (_pois.length > 0) {
+        //若存在之前节点，计算路径
+        this.AMap_Driving.maker.search(
+          pois[pois.length - 1].location,
+          event.lnglat,
+          function(status, result) {
+            if (status != "complete") {
+              this.$emit(
+                "error",
+                "查询从" +
+                  pois[pois.length - 1].name +
+                  "到" +
+                  event.name +
+                  "的路线出现错误"
+              );
+            } else {
+              transfer.plan = result;
+            }
+          }
+        );
+      }
+      //提交至vuex
+      that.$store.commit("addPOIFromMap", payload);
     }
   }
 };

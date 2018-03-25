@@ -5,7 +5,7 @@
     </div>
     <ul id="navlist">
       <router-link to="/" class="active">路径规划</router-link>
-      <router-link to="/hello" >路径检查</router-link>
+      <router-link to="/hello">路径检查</router-link>
     </ul>
   </div>
 </template>
