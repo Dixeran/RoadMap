@@ -1,23 +1,67 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view/>
+    <Navbar/>
+    <transition name="slide">
+      <Errorhandler @click.native="errorConfirmed" v-if="error != ''" :errorData="error"/>
+    </transition>
+    <keep-alive include="Roadpage" @error="HandleError">
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
 <script>
+import Navbar from "@/components/NavBar";
+import Errorhandler from "@/components/ErrorHandler";
 export default {
-  name: 'App'
-}
+  name: "App",
+  components: {
+    Navbar,
+    Errorhandler
+  },
+  methods: {
+    errorConfirmed: function(e) {
+      this.error = "";
+    },
+    HandleError: function(error) {
+      this.error = error;
+    }
+  },
+  data() {
+    return {
+      error: ""
+    };
+  }
+};
 </script>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+html,
+body,
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100%;
+}
+body {
+  margin: 0;
+}
+#Errorhandler {
+  position: fixed;
+  right: 4rem;
+  top: 4rem;
+}
+
+.slide-enter,
+.slide-leave-to {
+  opacity: 0;
+  transform: rotateX(90deg);
+  -webkit-transform: rotateX(90deg);
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.2s ease;
 }
 </style>
