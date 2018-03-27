@@ -16,20 +16,21 @@ import Errorhandler from "@/components/ErrorHandler";
 export default {
   name: "App",
   components: {
-    Navbar,Errorhandler
+    Navbar,
+    Errorhandler
   },
-  methods:{
-    errorConfirmed:function(e){
-      this.error = '';
+  methods: {
+    errorConfirmed: function(e) {
+      this.error = "";
     },
-    HandleError:function(error){
+    HandleError: function(error) {
       this.error = error;
     }
   },
-  data(){
-    return{
-      error:''
-    }
+  data() {
+    return {
+      error: ""
+    };
   }
 };
 </script>
@@ -38,24 +39,29 @@ export default {
 * {
   box-sizing: border-box;
 }
-html, body, #app{
+html,
+body,
+#app {
   height: 100%;
 }
 body {
   margin: 0;
 }
-#Errorhandler{
+#Errorhandler {
   position: fixed;
-  right: 4rem;top: 4rem;
+  right: 4rem;
+  top: 4rem;
 }
 
-.slide-enter, .slide-leave-to{
+.slide-enter,
+.slide-leave-to {
   opacity: 0;
   transform: rotateX(90deg);
   -webkit-transform: rotateX(90deg);
 }
 
-.slide-enter-active, .slide-leave-active{
+.slide-enter-active,
+.slide-leave-active {
   transition: all 0.2s ease;
 }
 </style>

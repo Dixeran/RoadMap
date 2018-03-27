@@ -11,14 +11,14 @@ export default new Router({
       path: '/',
       name: 'Roadpage',
       component: Roadpage,
-      meta:{
-        keepAlive:true
+      meta: {
+        keepAlive: true
       }
     },
     {
       path: '/hello',
       name: 'HelloWorld',
-      component:HelloWorld
+      component: HelloWorld
     }
   ]
 })

@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import Searchbar from './SearchBar.vue';
+import Searchbar from "./SearchBar.vue";
 export default {
   name: "Mapcontainer",
-  components:{
+  components: {
     Searchbar
   },
   data() {
@@ -22,12 +22,11 @@ export default {
         /*驾车规划配置*/
         config: {
           policy: AMap.DrivingPolicy.LEAST_TIME,
-          map: this.map,
+          map: {},
           hideMarkers: true,
-          autoFitView: false
-        },
-        /*规划对象*/
-        maker: {}
+          autoFitView: false,
+          showTraffic: false
+        }
       }
     };
   },
@@ -39,18 +38,17 @@ export default {
       center: [116.397428, 39.90923],
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
-    this.map = map;
+    this.AMap_Driving.config.map = this.map = map; //每个规划需要新的换乘对象，不能统一创建
 
-    /*驾车换乘对象*/
-    let driving = new AMap.Driving(this.AMap_Driving.config);
-    this.AMap_Driving.maker = driving;
+    /*驾车换乘对象*/ //let driving = new AMap.Driving(this.AMap_Driving.config);
+    //this.AMap_Driving.maker = driving;
 
     /*初始化地点搜索插件*/
     let searchConfig = this.$store.state.AMap_PlaceSearch.config;
     let search = new AMap.PlaceSearch(searchConfig);
-    this.$store.commit('setPlaceSearch', {
-      config:searchConfig,
-      search:search
+    this.$store.commit("setPlaceSearch", {
+      config: searchConfig,
+      search: search
     });
 
     /*绑定热点单击事件*/
@@ -90,7 +88,7 @@ export default {
         content: infoDiv,
         offset: new AMap.Pixel(0, -10),
         closeWhenClickMap: true,
-        autoMove:true
+        autoMove: true
       });
       infoWindow.open(this.map, event.lnglat);
     },
@@ -118,9 +116,11 @@ export default {
       marker.show();
 
       /*生成换乘*/
+      //_pois:当前日子的poi列表
       let _pois = this.$store.state.POIs[this.$store.state.nowDay];
       let transfer = {
         type: "driving",
+        kit: {},
         plan: {}
       };
       let payload = {
@@ -130,27 +130,34 @@ export default {
       };
       if (_pois.length > 0) {
         //若存在之前节点，计算路径
-        this.AMap_Driving.maker.search(
-          pois[pois.length - 1].location,
+        //trsts:前一节点到当前节点的规划对象
+        let trsts = new AMap.Driving(this.AMap_Driving.config);
+        transfer.kit = trsts;
+        trsts.search(
+          _pois[_pois.length - 1].detail.location,
           event.lnglat,
           function(status, result) {
             if (status != "complete") {
               this.$emit(
                 "error",
                 "查询从" +
-                  pois[pois.length - 1].name +
+                  _pois[pois.length - 1].name +
                   "到" +
                   event.name +
                   "的路线出现错误"
               );
             } else {
               transfer.plan = result;
+              console.log(result);
             }
+            //提交至vuex
+            that.$store.commit("addPOIFromMap", payload);
           }
         );
+      } else {
+        //提交至vuex
+        that.$store.commit("addPOIFromMap", payload);
       }
-      //提交至vuex
-      that.$store.commit("addPOIFromMap", payload);
     }
   }
 };
@@ -158,7 +165,7 @@ export default {
 
 <style>
 @import url("//at.alicdn.com/t/font_603677_nal037ttt5m9ggb9.css");
-#Mapcontainer{
+#Mapcontainer {
   position: relative;
 }
 #map {
@@ -205,9 +212,10 @@ export default {
   border-left: 40px solid transparent;
 }
 
-#Searchbar{
+#Searchbar {
   position: absolute;
-  left: 20px;top: 20px;
+  left: 20px;
+  top: 20px;
   z-index: 10000;
 }
 </style>

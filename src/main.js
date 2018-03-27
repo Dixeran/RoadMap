@@ -8,12 +8,13 @@ import router from './router'
 Vue.use(Vuex)
 Vue.config.productionTip = false
 /*{
-  id: '',
-  searchResult: '',
-  marker: '',
+  id: '',//唯一ID
+  detail: {},//PlaceSearch对象
+  marker: '',//点标记对象
   transfer: {
-    type: '',
-    plan: {}
+    type: '',//换乘类型
+    plan: {},//换乘方案
+    kit:{}//换乘AMap对象
   }
 }*/
 const store = new Vuex.Store({
@@ -69,7 +70,15 @@ const store = new Vuex.Store({
      * @param {*} payload.transfer 地图上路线规划的引用
      */
     addPOIFromMap(state, payload) {
-      console.log(payload);
+      state.AMap_PlaceSearch.search.getDetails(payload.id, function (status, result) {
+        if (status == 'complete') {
+          payload.detail = result.poiList.pois[0];
+        }
+        else {
+          console.log(result);
+        }
+      });
+      state.POIs[state.nowDay].push(payload);
     }
   }
 });

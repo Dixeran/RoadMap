@@ -28,13 +28,16 @@ export default {
     return {
       keyWord: "",
       suggests: [],
-      page:1,
+      page: 1,
       lastSearch: null
     };
   },
   watch: {
     keyWord: function() {
-      if (!this.lastSearch || this.lastSearch.getTime() - new Date().getTime() <= -300) {
+      if (
+        !this.lastSearch ||
+        this.lastSearch.getTime() - new Date().getTime() <= -300
+      ) {
         this.lastSearch = new Date();
         const pls = this.$store.state.AMap_PlaceSearch.search;
 
@@ -49,16 +52,16 @@ export default {
       }
     }
   },
-  methods:{
-    searchChecked:function(poi){
+  methods: {
+    searchChecked: function(poi) {
       let event = {
-        id:poi.id,
-        name:poi.name,
-        lnglat:poi.location,
-        type:poi.type
+        id: poi.id,
+        name: poi.name,
+        lnglat: poi.location,
+        type: poi.type
       };
-      this.$emit('searchChecked', event);
-      this.keyWord = '';
+      this.$emit("searchChecked", event);
+      this.keyWord = "";
     }
   }
 };
@@ -115,11 +118,13 @@ export default {
   color: rgb(202, 202, 202);
 }
 
-.list-enter, .list-leave-to{
+.list-enter,
+.list-leave-to {
   opacity: 0;
 }
 
-.list-enter-active, .list-leave-active{
+.list-enter-active,
+.list-leave-active {
   transition: all 0.2s ease;
 }
 </style>
