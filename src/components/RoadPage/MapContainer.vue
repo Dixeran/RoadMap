@@ -1,12 +1,17 @@
 <template>
   <div id="Mapcontainer">
     <div id="map"></div>
+    <Searchbar @searchChecked="createInfoWindow"/>
   </div>
 </template>
 
 <script>
+import Searchbar from './SearchBar.vue';
 export default {
   name: "Mapcontainer",
+  components:{
+    Searchbar
+  },
   data() {
     return {
       count: 0,
@@ -40,17 +45,18 @@ export default {
     let driving = new AMap.Driving(this.AMap_Driving.config);
     this.AMap_Driving.maker = driving;
 
+    /*初始化地点搜索插件*/
+    let searchConfig = this.$store.state.AMap_PlaceSearch.config;
+    let search = new AMap.PlaceSearch(searchConfig);
+    this.$store.commit('setPlaceSearch', {
+      config:searchConfig,
+      search:search
+    });
+
     /*绑定热点单击事件*/
     let that = this;
     let hpclick = map.on("hotspotclick", function(event) {
-      console.log(event);
-      let infoWindow = new AMap.InfoWindow({
-        isCustom: true, //使用自定义窗体
-        content: that.createInfoWindow(event),
-        offset: new AMap.Pixel(0, -10),
-        closeWhenClickMap: true
-      });
-      infoWindow.open(map, event.lnglat);
+      that.createInfoWindow(event);
     });
   },
   methods: {
@@ -78,7 +84,15 @@ export default {
       infoDiv.querySelector("#infoAction").onclick = function(e) {
         that.addPOIToData(event);
       };
-      return infoDiv;
+
+      let infoWindow = new AMap.InfoWindow({
+        isCustom: true, //使用自定义窗体
+        content: infoDiv,
+        offset: new AMap.Pixel(0, -10),
+        closeWhenClickMap: true,
+        autoMove:true
+      });
+      infoWindow.open(this.map, event.lnglat);
     },
     /**
      * @description 增加POI到总列表
@@ -144,6 +158,9 @@ export default {
 
 <style>
 @import url("//at.alicdn.com/t/font_603677_nal037ttt5m9ggb9.css");
+#Mapcontainer{
+  position: relative;
+}
 #map {
   height: 100%;
   width: 100%;
@@ -186,5 +203,11 @@ export default {
   border-top: 10px solid #4d8eb1;
   border-right: 40px solid transparent;
   border-left: 40px solid transparent;
+}
+
+#Searchbar{
+  position: absolute;
+  left: 20px;top: 20px;
+  z-index: 10000;
 }
 </style>

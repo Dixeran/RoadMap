@@ -20,9 +20,23 @@ const store = new Vuex.Store({
   state: {
     totalDays: 1,
     nowDay: 0,
-    POIs: [[]]
+    POIs: [[]],
+    AMap_PlaceSearch: {
+      config: {
+        city: '全国'
+      },
+      search: {}
+    }
   },
   mutations: {
+    /**@description 设置PlaceSearch插件
+     * @param {AMap.PlaceSearch} target 插件对象
+    */
+    setPlaceSearch(state, target) {
+      console.log(target);
+      state.AMap_PlaceSearch.config = target.config;
+      state.AMap_PlaceSearch.search = target.search;
+    },
     /**
      * @description 使天数+1
     */

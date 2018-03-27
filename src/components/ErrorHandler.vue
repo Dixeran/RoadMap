@@ -17,8 +17,8 @@ export default {
   padding: 0.2rem 0.5rem;
   background-color: #f05038;
   color: white;
-  box-shadow: 0 0 2px #b83e2c;
-  border-radius: 0.2rem;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
   transition: all ease 0.2s;
 }
 #Errorhandler:hover{
