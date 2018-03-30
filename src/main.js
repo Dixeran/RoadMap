@@ -50,7 +50,7 @@ const store = new Vuex.Store({
      * @param {number} d 切换到d天（数组编号）
     */
     switchDay(state, d) {
-      if (d <= state.totalDays) {
+      if (d < state.totalDays && d >= 0) {
         state.nowDay = d;
       }
     },
@@ -59,8 +59,10 @@ const store = new Vuex.Store({
      * @param {number} d 删除第d天（数组编号）
      */
     deleteDay(state, d) {
-      if (d <= state.totalDays) {
+      if (d < state.totalDays && d >= 0) {
         state.POIs.splice(d, 1);
+        state.totalDays--;
+        if (state.nowDay == d) state.nowDay--;
       }
     },
     /**

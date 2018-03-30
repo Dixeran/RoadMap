@@ -164,7 +164,6 @@ export default {
 </script>
 
 <style>
-@import url("//at.alicdn.com/t/font_603677_0hlizqfnpv7bke29.css");
 #Mapcontainer {
   position: relative;
 }

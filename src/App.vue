@@ -36,6 +36,7 @@ export default {
 </script>
 
 <style>
+@import url('//at.alicdn.com/t/font_603677_csdmkp41jv5nrk9.css');
 * {
   box-sizing: border-box;
 }
