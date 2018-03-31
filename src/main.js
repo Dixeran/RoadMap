@@ -13,6 +13,7 @@ Vue.config.productionTip = false
   marker: '',//点标记对象
   transfer: {
     type: '',//换乘类型
+    index: number, //换乘方案索引
     plan: {},//换乘方案
     kit:{}//换乘AMap对象
   }
@@ -51,6 +52,16 @@ const store = new Vuex.Store({
     */
     switchDay(state, d) {
       if (d < state.totalDays && d >= 0) {
+        //TODO:修改marker/path
+        let nowP = state.POIs[state.nowDay];
+        for (var i = 0; i < nowP.length; i++){
+          nowP[i].marker.hide();//hide marker
+          //nowP[i].transfer
+        }
+        let newP = state.POIs[d];
+        for (var j = 0; j < newP.length; j++){
+          newP[j].marker.show();
+        }
         state.nowDay = d;
       }
     },
@@ -60,9 +71,10 @@ const store = new Vuex.Store({
      */
     deleteDay(state, d) {
       if (d < state.totalDays && d >= 0) {
+        //TODO:修改marker/path
         state.POIs.splice(d, 1);
         state.totalDays--;
-        if (state.nowDay == d) state.nowDay--;
+        if (state.nowDay == d && state.nowDay > 0) state.nowDay--;
       }
     },
     /**
@@ -75,12 +87,13 @@ const store = new Vuex.Store({
       state.AMap_PlaceSearch.search.getDetails(payload.id, function (status, result) {
         if (status == 'complete') {
           payload.detail = result.poiList.pois[0];
+          state.POIs[state.nowDay].push(payload);
         }
         else {
           console.log(result);
+          state.POIs[state.nowDay].push(payload);
         }
       });
-      state.POIs[state.nowDay].push(payload);
     }
   }
 });

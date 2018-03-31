@@ -23,19 +23,71 @@
     <div id="paths">
       <ul>
         <div class="nodeCard">
-          <div class="cd-select">
-            <select name="cd-method" class="cd-method">
+          <!--换乘选择-->
+          <div class="cd-select-group">
+            <select name="cd-method" class="cd-select">
               <option value="#">驾车</option>
               <option value="#">公交</option>
               <option value="#">步行</option>
               <option value="#">骑行</option>
             </select>
-            <a href="#"></a>
+            <select name="cd-plan" class="cd-select">
+              <option value="#">方案一</option>
+              <option value="#">方案二</option>
+            </select>
+            <a href="#"><!--TODO:click-->
+              <i class="iconfont icon-more"></i>
+            </a>
           </div>
+          <!--路程规划详情-->
           <div class="cd-transfer"></div>
-          <div class="cd-main"></div>
+          <!--目的地详情-->
+          <div class="cd-main">
+            <div type="simple">
+              <!--TODO:click-->
+              <span><i class="iconfont icon-more"></i></span>
+              <p>阿里云</p>
+              <p class="sm">贵州省关山湖区40层</p>
+            </div>
+            <div type="detail"></div>
+          </div>
+          <!--底部操作-->
           <div class="cd-footer"></div>
         </div>
+        <template v-for="item in $store.state.POIs[$store.state.nowDay]">
+          <div class="nodeCard" :key="item.name">
+            <!--换乘选择-->
+            <div class="cd-select-group">
+              <select name="cd-method" class="cd-select">
+                <option value="#">驾车</option>
+                <option value="#">公交</option>
+                <option value="#">步行</option>
+                <option value="#">骑行</option>
+              </select>
+              <select name="cd-plan" class="cd-select">
+                <option value="#">方案一</option>
+                <option value="#">方案二</option>
+              </select>
+              <a href="#"><!--TODO:click-->
+                <i class="iconfont icon-more"></i>
+              </a>
+            </div>
+            <!--路程规划详情-->
+            <div class="cd-transfer"></div>
+            <!--目的地详情-->
+            <div class="cd-main">
+              <div type="simple">
+                <!--TODO:click-->
+                <span><i class="iconfont icon-more"></i></span>
+                <p>{{item.detail.name}}</p>
+                <p class="sm">{{item.detail.address}}</p>
+              </div>
+              <div type="detail"></div>
+            </div>
+            <!--底部操作-->
+            <div class="cd-footer"></div>
+          </div>
+        </template>
       </ul>
     </div>
   </div>
@@ -106,5 +158,65 @@ export default {
   font-size: 12px;
   color: whitesmoke;
   background-color: #2384b8;
+}
+
+#paths{
+  width: 100%;
+  overflow-y: auto;
+}
+
+#paths > ul{
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.nodeCard{
+  width: 100%;
+  margin: 1rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+.cd-select-group{
+  display: flex;
+  padding: 5px;
+  border-bottom: 2px dashed whitesmoke;
+}
+.cd-select-group > select{
+  flex: 1 1 auto;
+  margin: 0 16px;
+  border: none;
+  outline: none;
+}
+.cd-select-group > a{
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.cd-select-group > a:hover{
+  background-color: rgb(212, 212, 212);
+}
+
+.cd-main{
+  color: white;
+  background-color: #2384b8;
+  border-left: #4d8eb1 1rem solid;
+  border-radius: 2px;
+}
+.cd-main > div[type=simple]{
+  padding: 5px;
+}
+.cd-main > div[type=simple] > p{
+  margin: 0;
+}
+.cd-main > div[type=simple] > .sm{
+  font-size: 12px;
+  color: rgb(202, 202, 202);
+}
+.cd-main > div[type=simple] > span{
+  float: right;
+}
+.transfer{
+  border-bottom: 2px dashed whitesmoke;
 }
 </style>

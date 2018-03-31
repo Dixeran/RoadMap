@@ -1,7 +1,7 @@
 <template>
   <div id="Mapcontainer">
     <div id="map"></div>
-    <Searchbar @searchChecked="createInfoWindow"/>
+    <Searchbar @searchChecked="createInfoWindow" @click.native="tt"/>
   </div>
 </template>
 
@@ -58,6 +58,9 @@ export default {
     });
   },
   methods: {
+    tt(){
+      console.log(this.map.getAllOverlays())
+    },
     /**
      * @description 创建点击热点信息窗体
      * @param {AMP click event} event 点击地图触发的事件对象
@@ -120,6 +123,7 @@ export default {
       let _pois = this.$store.state.POIs[this.$store.state.nowDay];
       let transfer = {
         type: "driving",
+        index:0,
         kit: {},
         plan: {}
       };
