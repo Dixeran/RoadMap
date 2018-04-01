@@ -5,8 +5,8 @@ import Vuex from 'vuex'
 import App from './App'
 import router from './router'
 
-Vue.use(Vuex)
-Vue.config.productionTip = false
+Vue.use(Vuex);
+Vue.config.productionTip = false;
 /*{
   id: '',//唯一ID
   detail: {},//PlaceSearch对象

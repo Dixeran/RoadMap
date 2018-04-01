@@ -39,7 +39,6 @@ export default {
 }
 
 #navlist {
-  margin: 0;
   padding: 0;
   margin: 0 3rem;
   display: inline-block;

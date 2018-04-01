@@ -22,38 +22,6 @@
     </div>
     <div id="paths">
       <ul>
-        <div class="nodeCard">
-          <!--换乘选择-->
-          <div class="cd-select-group">
-            <select name="cd-method" class="cd-select">
-              <option value="#">驾车</option>
-              <option value="#">公交</option>
-              <option value="#">步行</option>
-              <option value="#">骑行</option>
-            </select>
-            <select name="cd-plan" class="cd-select">
-              <option value="#">方案一</option>
-              <option value="#">方案二</option>
-            </select>
-            <a href="#"><!--TODO:click-->
-              <i class="iconfont icon-more"></i>
-            </a>
-          </div>
-          <!--路程规划详情-->
-          <div class="cd-transfer"></div>
-          <!--目的地详情-->
-          <div class="cd-main">
-            <div type="simple">
-              <!--TODO:click-->
-              <span><i class="iconfont icon-more"></i></span>
-              <p>阿里云</p>
-              <p class="sm">贵州省关山湖区40层</p>
-            </div>
-            <div type="detail"></div>
-          </div>
-          <!--底部操作-->
-          <div class="cd-footer"></div>
-        </div>
         <template v-for="item in $store.state.POIs[$store.state.nowDay]">
           <div class="nodeCard" :key="item.name">
             <!--换乘选择-->
@@ -85,7 +53,11 @@
               <div type="detail"></div>
             </div>
             <!--底部操作-->
-            <div class="cd-footer"></div>
+            <div class="cd-footer">
+              <a href="#"><i class="iconfont icon-androidlocate"></i></a>
+              <a href="#"><i class="iconfont icon-move"></i></a>
+              <a href="#"><i class="iconfont icon-delete color-alert"></i></a>
+            </div>
           </div>
         </template>
       </ul>
@@ -216,7 +188,28 @@ export default {
 .cd-main > div[type=simple] > span{
   float: right;
 }
+
 .transfer{
   border-bottom: 2px dashed whitesmoke;
+}
+
+.cd-footer {
+  border-top: 2px dashed whitesmoke;
+  padding: 2px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+.cd-footer > a{
+  text-decoration: none;
+  color: #333;
+  flex: 1 1 auto;
+  text-align: center;
+}
+.cd-footer > a:hover{
+  background-color: whitesmoke;
+}
+.color-alert {
+  color: #e2414c;
 }
 </style>

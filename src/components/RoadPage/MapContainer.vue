@@ -1,7 +1,7 @@
 <template>
   <div id="Mapcontainer">
     <div id="map"></div>
-    <Searchbar @searchChecked="createInfoWindow" @click.native="tt"/>
+    <Searchbar @searchChecked="createInfoWindow"/>
   </div>
 </template>
 
@@ -58,9 +58,6 @@ export default {
     });
   },
   methods: {
-    tt(){
-      console.log(this.map.getAllOverlays())
-    },
     /**
      * @description 创建点击热点信息窗体
      * @param {AMP click event} event 点击地图触发的事件对象
