@@ -15,6 +15,7 @@ Vue.config.productionTip = false;
     type: '',//换乘类型
     index: number, //换乘方案索引
     plan: {},//换乘方案
+    routes:{},//换乘绘制路线
     kit:{}//换乘AMap对象
   }
 }*/
@@ -56,11 +57,12 @@ const store = new Vuex.Store({
         let nowP = state.POIs[state.nowDay];
         for (var i = 0; i < nowP.length; i++){
           nowP[i].marker.hide();//hide marker
-          //nowP[i].transfer
+          nowP[i].transfer.routes.hide ? nowP[i].transfer.routes.hide() : null;//hide path
         }
         let newP = state.POIs[d];
         for (var j = 0; j < newP.length; j++){
-          newP[j].marker.show();
+          newP[j].marker.show();//show marker
+          newP[j].transfer.routes.show ? newP[j].transfer.routes.show() : null;//show path
         }
         state.nowDay = d;
       }
@@ -84,14 +86,19 @@ const store = new Vuex.Store({
      * @param {*} payload.transfer 地图上路线规划的引用
      */
     addPOIFromMap(state, payload) {
-      state.AMap_PlaceSearch.search.getDetails(payload.id, function (status, result) {
+      state.POIs[state.nowDay].push(payload);
+    }
+  },
+  actions:{
+    addPOIFromMap(context, payload){
+      context.state.AMap_PlaceSearch.search.getDetails(payload.id, function (status, result) {
         if (status == 'complete') {
           payload.detail = result.poiList.pois[0];
-          state.POIs[state.nowDay].push(payload);
+          context.commit('addPOIFromMap', payload);
         }
         else {
           console.log(result);
-          state.POIs[state.nowDay].push(payload);
+          context.commit('addPOIFromMap', payload);
         }
       });
     }

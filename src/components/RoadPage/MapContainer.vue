@@ -22,7 +22,6 @@ export default {
         /*驾车规划配置*/
         config: {
           policy: AMap.DrivingPolicy.LEAST_TIME,
-          map: {},
           hideMarkers: true,
           autoFitView: false,
           showTraffic: false
@@ -38,7 +37,8 @@ export default {
       center: [116.397428, 39.90923],
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
-    this.AMap_Driving.config.map = this.map = map; //每个规划需要新的换乘对象，不能统一创建
+    //this.AMap_Driving.config.map = map;//每个规划需要新的换乘对象，不能统一创建
+    this.map = map; //全局保存map实例
 
     /*驾车换乘对象*/ //let driving = new AMap.Driving(this.AMap_Driving.config);
     //this.AMap_Driving.maker = driving;
@@ -122,7 +122,8 @@ export default {
         type: "driving",
         index:0,
         kit: {},
-        plan: {}
+        plan: {},
+        routes:{}
       };
       let payload = {
         id: event.id,
@@ -149,15 +150,36 @@ export default {
               );
             } else {
               transfer.plan = result;
-              console.log(result);
+
+              //获取路径坐标自绘
+              let routesPoints = [];
+              for(let t = 0; t < result.routes[0].steps.length; t++){
+                //遍历子路段
+                for(let i = 0; i < result.routes[0].steps[t].path.length; i++){
+                  //遍历路段坐标
+                  routesPoints.push(result.routes[0].steps[t].path[i]);
+                }
+              }
+              let routes = new AMap.Polyline({
+                map:that.map,
+                isOutline:true,
+                outlineColor:"#FFFFFF",
+                strokeWeight:5,
+                strokeColor:"#13afc8",
+                showDir:true,
+                lineJoin:"round",
+                path:routesPoints
+              });
+              transfer.routes = routes;
             }
+            payload.transfer = transfer;
             //提交至vuex
-            that.$store.commit("addPOIFromMap", payload);
+            that.$store.dispatch("addPOIFromMap", payload);
           }
         );
       } else {
         //提交至vuex
-        that.$store.commit("addPOIFromMap", payload);
+        that.$store.dispatch("addPOIFromMap", payload);
       }
     }
   }
