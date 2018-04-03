@@ -38,10 +38,9 @@ export default {
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
     //this.AMap_Driving.config.map = map;//每个规划需要新的换乘对象，不能统一创建
-    this.map = map; //全局保存map实例
+    this.map = map; //全局保存map实例 //let driving = new AMap.Driving(this.AMap_Driving.config);
 
-    /*驾车换乘对象*/ //let driving = new AMap.Driving(this.AMap_Driving.config);
-    //this.AMap_Driving.maker = driving;
+    /*驾车换乘对象*/ //this.AMap_Driving.maker = driving;
 
     /*初始化地点搜索插件*/
     let searchConfig = this.$store.state.AMap_PlaceSearch.config;
@@ -120,10 +119,10 @@ export default {
       let _pois = this.$store.state.POIs[this.$store.state.nowDay];
       let transfer = {
         type: "driving",
-        index:0,
+        index: 0,
         kit: {},
         plan: {},
-        routes:{}
+        routes: {}
       };
       let payload = {
         id: event.id,
@@ -153,22 +152,26 @@ export default {
 
               //获取路径坐标自绘
               let routesPoints = [];
-              for(let t = 0; t < result.routes[0].steps.length; t++){
+              for (let t = 0; t < result.routes[0].steps.length; t++) {
                 //遍历子路段
-                for(let i = 0; i < result.routes[0].steps[t].path.length; i++){
+                for (
+                  let i = 0;
+                  i < result.routes[0].steps[t].path.length;
+                  i++
+                ) {
                   //遍历路段坐标
                   routesPoints.push(result.routes[0].steps[t].path[i]);
                 }
               }
               let routes = new AMap.Polyline({
-                map:that.map,
-                isOutline:true,
-                outlineColor:"#FFFFFF",
-                strokeWeight:5,
-                strokeColor:"#13afc8",
-                showDir:true,
-                lineJoin:"round",
-                path:routesPoints
+                map: that.map,
+                isOutline: true,
+                outlineColor: "#FFFFFF",
+                strokeWeight: 5,
+                strokeColor: "#13afc8",
+                showDir: true,
+                lineJoin: "round",
+                path: routesPoints
               });
               transfer.routes = routes;
             }

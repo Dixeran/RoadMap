@@ -77,6 +77,7 @@ export default {
 <style scoped>
 #Detailpath {
   border-left: 1px solid rgba(0, 0, 0, 0.2);
+  overflow-y: hidden;
 }
 
 #daySelector {
@@ -132,64 +133,67 @@ export default {
   background-color: #2384b8;
 }
 
-#paths{
+#paths {
   width: 100%;
+  height: calc(100% - 3rem);
   overflow-y: auto;
+  background-color: #f1f1f1;
 }
 
-#paths > ul{
+#paths > ul {
   width: 100%;
   padding: 0;
   margin: 0;
 }
 
-.nodeCard{
+.nodeCard {
   width: 100%;
   margin: 1rem 0;
+  background-color: white;
   border-top: 1px solid rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
 }
-.cd-select-group{
+.cd-select-group {
   display: flex;
   padding: 5px;
   border-bottom: 2px dashed whitesmoke;
 }
-.cd-select-group > select{
+.cd-select-group > select {
   flex: 1 1 auto;
   margin: 0 16px;
   border: none;
   outline: none;
 }
-.cd-select-group > a{
+.cd-select-group > a {
   text-decoration: none;
   transition: all 0.2s ease;
 }
-.cd-select-group > a:hover{
+.cd-select-group > a:hover {
   background-color: rgb(212, 212, 212);
 }
 
-.cd-main{
+.cd-main {
   color: white;
   background-color: #2384b8;
   border-left: #4d8eb1 1rem solid;
   border-radius: 2px;
 }
-.cd-main > div[type=simple]{
+.cd-main > div[type="simple"] {
   padding: 5px;
 }
-.cd-main > div[type=simple] > p{
+.cd-main > div[type="simple"] > p {
   margin: 0;
 }
-.cd-main > div[type=simple] > .sm{
+.cd-main > div[type="simple"] > .sm {
   font-size: 12px;
   color: rgb(202, 202, 202);
 }
-.cd-main > div[type=simple] > span{
+.cd-main > div[type="simple"] > span {
   float: right;
 }
 
-.transfer{
+.transfer {
   border-bottom: 2px dashed whitesmoke;
 }
 
@@ -200,13 +204,13 @@ export default {
   align-content: center;
   justify-content: center;
 }
-.cd-footer > a{
+.cd-footer > a {
   text-decoration: none;
   color: #333;
   flex: 1 1 auto;
   text-align: center;
 }
-.cd-footer > a:hover{
+.cd-footer > a:hover {
   background-color: whitesmoke;
 }
 .color-alert {
