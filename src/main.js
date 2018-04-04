@@ -24,11 +24,22 @@ const store = new Vuex.Store({
     totalDays: 1,
     nowDay: 0,
     POIs: [[]],
+    /*地点搜索*/
     AMap_PlaceSearch: {
       config: {
         city: "全国"
       },
       search: {}
+    },
+    /*驾车规划*/
+    AMap_Driving: {
+      /*驾车规划配置*/
+      config: {
+        policy: AMap.DrivingPolicy.LEAST_TIME,
+        hideMarkers: true,
+        autoFitView: false,
+        showTraffic: false
+      }
     }
   },
   mutations: {

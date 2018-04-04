@@ -16,17 +16,7 @@ export default {
     return {
       count: 0,
       /*地图对象*/
-      map: {},
-      /*驾车规划*/
-      AMap_Driving: {
-        /*驾车规划配置*/
-        config: {
-          policy: AMap.DrivingPolicy.LEAST_TIME,
-          hideMarkers: true,
-          autoFitView: false,
-          showTraffic: false
-        }
-      }
+      map: {}
     };
   },
   mounted: function() {
@@ -37,10 +27,7 @@ export default {
       center: [116.397428, 39.90923],
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
-    //this.AMap_Driving.config.map = map;//每个规划需要新的换乘对象，不能统一创建
-    this.map = map; //全局保存map实例 //let driving = new AMap.Driving(this.AMap_Driving.config);
-
-    /*驾车换乘对象*/ //this.AMap_Driving.maker = driving;
+    this.map = map; //全局保存map
 
     /*初始化地点搜索插件*/
     let searchConfig = this.$store.state.AMap_PlaceSearch.config;
@@ -92,6 +79,64 @@ export default {
       infoWindow.open(this.map, event.lnglat);
     },
     /**
+     * @description 生成路径规划结果
+     * @param {poi object} poi 高德POI对象
+     * @param {string} type 路径规划类别
+     * @return {transfer object} transfer对象
+     */
+    createTransferObj: function(poiFrom, poiTo, type) {
+      let that = this;
+      return new Promise(function(resolve, reject) {
+        let transfer = {
+          type: "",
+          index: 0,
+          kit: {},
+          plan: {},
+          routes: {}
+        };
+        if (type === "driving") {
+          //Driving plan
+          transfer.type = "driving";
+          let kit = new AMap.Driving(that.$store.state.AMap_Driving.config);
+          transfer.kit = kit;
+          kit.search(poiFrom, poiTo, function(statue, result) {
+            if (status == "complete") {
+              transfer.plan = result;
+              //获取路径坐标自绘
+              let routesPoints = [];
+              for (let t = 0; t < result.routes[0].steps.length; t++) {
+                //遍历子路段
+                for (
+                  let i = 0;
+                  i < result.routes[0].steps[t].path.length;
+                  i++
+                ) {
+                  //遍历路段坐标
+                  routesPoints.push(result.routes[0].steps[t].path[i]);
+                }
+              }
+              let routes = new AMap.Polyline({
+                map: that.map,
+                isOutline: true,
+                outlineColor: "#FFFFFF",
+                strokeWeight: 5,
+                strokeColor: "#13afc8",
+                showDir: true,
+                lineJoin: "round",
+                path: routesPoints
+              });
+              transfer.routes = routes;
+              resolve(transfer); //resolve result
+            } else reject();
+          });
+        } else if (type === "bus") {
+        } else if (type === "ride") {
+        } else if (type === "walk") {
+        } else {
+        }
+      });
+    },
+    /**
      * @description 增加POI到总列表
      * @param {POI event} event 事件obj
      */
@@ -117,69 +162,22 @@ export default {
       /*生成换乘*/
       //_pois:当前日子的poi列表
       let _pois = this.$store.state.POIs[this.$store.state.nowDay];
-      let transfer = {
-        type: "driving",
-        index: 0,
-        kit: {},
-        plan: {},
-        routes: {}
-      };
       let payload = {
         id: event.id,
         marker: marker,
-        transfer: transfer
+        transfer: null
       };
       if (_pois.length > 0) {
         //若存在之前节点，计算路径
         //trsts:前一节点到当前节点的规划对象
-        let trsts = new AMap.Driving(this.AMap_Driving.config);
-        transfer.kit = trsts;
-        trsts.search(
+        this.createTransferObj(
           _pois[_pois.length - 1].detail.location,
           event.lnglat,
-          function(status, result) {
-            if (status != "complete") {
-              this.$emit(
-                "error",
-                "查询从" +
-                  _pois[pois.length - 1].name +
-                  "到" +
-                  event.name +
-                  "的路线出现错误"
-              );
-            } else {
-              transfer.plan = result;
-
-              //获取路径坐标自绘
-              let routesPoints = [];
-              for (let t = 0; t < result.routes[0].steps.length; t++) {
-                //遍历子路段
-                for (
-                  let i = 0;
-                  i < result.routes[0].steps[t].path.length;
-                  i++
-                ) {
-                  //遍历路段坐标
-                  routesPoints.push(result.routes[0].steps[t].path[i]);
-                }
-              }
-              let routes = new AMap.Polyline({
-                map: that.map,
-                isOutline: true,
-                outlineColor: "#FFFFFF",
-                strokeWeight: 5,
-                strokeColor: "#13afc8",
-                showDir: true,
-                lineJoin: "round",
-                path: routesPoints
-              });
-              transfer.routes = routes;
-            }
-            payload.transfer = transfer;
-            //提交至vuex
-            that.$store.dispatch("addPOIFromMap", payload);
-          }
-        );
+          "driving"
+        ).then(result => {
+          payload.transfer = result;
+          that.$store.dispatch("addPOIFromMap", payload);
+        });
       } else {
         //提交至vuex
         that.$store.dispatch("addPOIFromMap", payload);
