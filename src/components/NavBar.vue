@@ -7,6 +7,10 @@
       <router-link to="/" class="active">路径规划</router-link>
       <router-link to="/hello">路径检查</router-link>
     </ul>
+    <input id="cityName" type="text"
+           v-model="$store.state.city"
+           v-bind:class="$store.state.city == '' ? 'unName' : ''"
+           placeholder="输入城市名">
   </div>
 </template>
 
@@ -42,6 +46,7 @@ export default {
   padding: 0;
   margin: 0 3rem;
   display: inline-block;
+  margin-right: auto;
 }
 #navlist a {
   list-style: none;
@@ -59,5 +64,17 @@ export default {
 #navlist .active {
   background-color: #2384b8;
   color: white;
+}
+#cityName {
+  width: 6rem;
+  margin-right: 10px;
+  padding: 2px;
+  border: 1px solid #2384b8;
+  border-radius: 3px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.unName {
+  border: 2px solid #f05038 !important;
 }
 </style>

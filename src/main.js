@@ -15,12 +15,13 @@ Vue.config.productionTip = false;
     type: '',//换乘类型
     index: number, //换乘方案索引
     plan: {},//换乘方案
-    routes:{},//换乘绘制路线
+    routes:[{}],//换乘绘制路线
     kit:{}//换乘AMap对象
   }
 }*/
 const store = new Vuex.Store({
   state: {
+    city: "",
     totalDays: 1,
     nowDay: 0,
     POIs: [[]],
@@ -33,13 +34,24 @@ const store = new Vuex.Store({
     },
     /*驾车规划*/
     AMap_Driving: {
-      /*驾车规划配置*/
-      config: {
-        policy: AMap.DrivingPolicy.LEAST_TIME,
-        hideMarkers: true,
-        autoFitView: false,
-        showTraffic: false
-      }
+      policy: AMap.DrivingPolicy.LEAST_TIME,
+      hideMarkers: true,
+      autoFitView: false,
+      showTraffic: false
+    },
+    /*公交规划*/
+    AMap_Bus: {
+      city: this.city,
+      hideMarkers: true,
+      autoFitView: false
+    },
+    AMap_Ride:{
+      hideMarkers:true,
+      autoFitView:false
+    },
+    AMap_Walk:{
+      hideMarkers:true,
+      autoFitView:false
     }
   },
   mutations: {
@@ -67,12 +79,20 @@ const store = new Vuex.Store({
         let nowP = state.POIs[state.nowDay];
         for (var i = 0; i < nowP.length; i++) {
           nowP[i].marker.hide(); //hide marker
-          nowP[i].transfer.routes.hide ? nowP[i].transfer.routes.hide() : null; //hide path
+          if (nowP[i].transfer) {
+            for (z in nowP[z].transfer.routes) {
+              nowP[i].transfer.routes[z].hide(); //hide path
+            }
+          }
         }
         let newP = state.POIs[d];
         for (var j = 0; j < newP.length; j++) {
           newP[j].marker.show(); //show marker
-          newP[j].transfer.routes.show ? newP[j].transfer.routes.show() : null; //show path
+          if (newP[j].transfer) {
+            for (z in newP[j].transfer.routes) {
+              newP[j].transfer.routes[z].show();
+            }
+          }
         }
         state.nowDay = d;
       }
@@ -113,6 +133,7 @@ const store = new Vuex.Store({
   },
   actions: {
     addPOIFromMap(context, payload) {
+      console.log(payload);
       context.state.AMap_PlaceSearch.search.getDetails(payload.id, function(
         status,
         result

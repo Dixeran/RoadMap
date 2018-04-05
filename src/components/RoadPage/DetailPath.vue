@@ -25,20 +25,17 @@
         <template v-for="item in $store.state.POIs[$store.state.nowDay]">
           <div class="nodeCard" :key="item.name">
             <!--换乘选择-->
-            <div class="cd-select-group">
-              <select name="cd-method" class="cd-select">
-                <option value="#">驾车</option>
-                <option value="#">公交</option>
-                <option value="#">步行</option>
-                <option value="#">骑行</option>
+            <div class="cd-select-group" v-if="item.transfer">
+              <select name="cd-method" class="cd-select" v-model="item.transfer.type">
+                <option v-for="option in transPlan" v-bind:value="option.data">
+                  {{option.name}}
+                </option>
               </select>
-              <select name="cd-plan" class="cd-select">
-                <option value="#">方案一</option>
-                <option value="#">方案二</option>
+              <select name="cd-plan" class="cd-select" v-model="item.transfer.index">
+                <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)" v-bind:value="n - 1">
+                  方案{{n}}
+                </option>
               </select>
-              <a href="#"><!--TODO:click-->
-                <i class="iconfont icon-more"></i>
-              </a>
             </div>
             <!--路程规划详情-->
             <div class="cd-transfer"></div>
@@ -69,7 +66,26 @@
 export default {
   name: "Detailpath",
   data() {
-    return {};
+    return {
+      transPlan: [
+        {
+          data: "driving",
+          name: "驾车"
+        },
+        {
+          data: "bus",
+          name: "公交"
+        },
+        {
+          data: "ride",
+          name: "骑行"
+        },
+        {
+          data: "walk",
+          name: "步行"
+        }
+      ]
+    };
   }
 };
 </script>
@@ -164,13 +180,6 @@ export default {
   margin: 0 16px;
   border: none;
   outline: none;
-}
-.cd-select-group > a {
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-.cd-select-group > a:hover {
-  background-color: rgb(212, 212, 212);
 }
 
 .cd-main {

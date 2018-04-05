@@ -79,6 +79,97 @@ export default {
       infoWindow.open(this.map, event.lnglat);
     },
     /**
+     * @description 根据type将result的路径画出
+     * @param {search result} result 搜索结果
+     * @param {string} type 搜索类型
+     * @param {number} index 方案索引
+     */
+    drawResultOnMap(result, index, type) {
+      let that = this;
+      let routes = [];
+      if (type === "driving") {//driving plan
+        let routesPoints = [];
+        for (let t = 0; t < result.routes[index].steps.length; t++) {
+          //遍历子路段
+          for (let i = 0; i < result.routes[index].steps[t].path.length; i++) {
+            //遍历路段坐标
+            routesPoints.push(result.routes[index].steps[t].path[i]);
+          }
+        }
+        let _route = new AMap.Polyline({
+          map: that.map,
+          isOutline: true,
+          outlineColor: "#FFFFFF",
+          strokeWeight: 5,
+          strokeColor: "#13afc8",
+          showDir: true,
+          lineJoin: "round",
+          path: routesPoints
+        });
+        routes.push(_route);
+        return routes;
+      } else if (type === "bus") {//bus plan
+        let plan = result.plans[index];
+        for (let i = 0; i < plan.segments.length; i++) {
+          let _route = new AMap.Polyline({
+            map: that.map,
+            isOutline: true,
+            outlineColor: "#FFFFFF",
+            strokeWeight: 5,
+            strokeColor:
+              plan.segments[i].transit_mode == "BUS" ? "#2775b6" : "#fed71a",
+            showDir: true,
+            lineJoin: "round",
+            path: plan.segments[i].transit.path
+          });
+          routes.push(_route);
+        }
+        return routes;
+      }
+      else if (type === 'ride'){
+        let plan = result.routes[index];
+        let routesPoints = [];
+        for(let i = 0; i < plan.steps.length; i++){
+          for(let j = 0; j < plan.steps[i].path.length; j++){
+            routesPoints.push(plan.steps[i].path[j])
+          }
+        }
+        let _route = new AMap.Polyline({
+          map: that.map,
+          isOutline: true,
+          outlineColor: "#FFFFFF",
+          strokeWeight: 5,
+          strokeColor: "#21a265",
+          showDir: true,
+          lineJoin: "round",
+          path: routesPoints
+        });
+        routes.push(_route);
+        return routes;
+      }
+      else if(type === 'walk'){
+        let plan = result.routes[index];
+        let routesPoints = [];
+        for(let i = 0; i < plan.steps.length; i++){
+          for(let j = 0; j < plan.steps[i].path.length; j++){
+            routesPoints.push(plan.steps[i].path[j])
+          }
+        }
+        let _route = new AMap.Polyline({
+          map: that.map,
+          isOutline: true,
+          outlineColor: "#FFFFFF",
+          strokeWeight: 5,
+          strokeColor: "#fed71a",
+          showDir: true,
+          lineJoin: "round",
+          path: routesPoints
+        });
+        routes.push(_route);
+        return routes;
+      }
+    },
+    /**
      * @description 生成路径规划结果
      * @param {poi object} poi 高德POI对象
      * @param {string} type 路径规划类别
@@ -97,41 +188,58 @@ export default {
         if (type === "driving") {
           //Driving plan
           transfer.type = "driving";
-          let kit = new AMap.Driving(that.$store.state.AMap_Driving.config);
+          let kit = new AMap.Driving(that.$store.state.AMap_Driving);
           transfer.kit = kit;
           kit.search(poiFrom, poiTo, function(statue, result) {
-            if (status == "complete") {
+            if (statue == "complete") {
               transfer.plan = result;
-              //获取路径坐标自绘
-              let routesPoints = [];
-              for (let t = 0; t < result.routes[0].steps.length; t++) {
-                //遍历子路段
-                for (
-                  let i = 0;
-                  i < result.routes[0].steps[t].path.length;
-                  i++
-                ) {
-                  //遍历路段坐标
-                  routesPoints.push(result.routes[0].steps[t].path[i]);
-                }
-              }
-              let routes = new AMap.Polyline({
-                map: that.map,
-                isOutline: true,
-                outlineColor: "#FFFFFF",
-                strokeWeight: 5,
-                strokeColor: "#13afc8",
-                showDir: true,
-                lineJoin: "round",
-                path: routesPoints
-              });
-              transfer.routes = routes;
+              transfer.routes = that.drawResultOnMap(result, 0, "driving"); //draw result
               resolve(transfer); //resolve result
-            } else reject();
+            } else {
+              console.log(result);
+              reject();
+            }
           });
         } else if (type === "bus") {
+          //bus plan
+          transfer.type = "bus";
+          let kit = new AMap.Transfer(that.$store.state.AMap_Bus);
+          transfer.kit = kit;
+          kit.search(poiFrom, poiTo, function(statue, result) {
+            if (statue == "complete") {
+              transfer.plan = result;
+              transfer.routes = that.drawResultOnMap(result, 0, "bus");
+              resolve(transfer);
+            } else {
+              reject(result);
+            }
+          });
         } else if (type === "ride") {
+          transfer.type = 'rede';
+          let kit = new AMap.Riding(that.$store.state.AMap_Ride);
+          transfer.kit = kit;
+          kit.search(poiFrom, poiTo, function (statue, result) {
+            if(statue == 'complete'){
+              transfer.plan = result;
+              transfer.routes = that.drawResultOnMap(result, 0, "ride");
+              resolve(transfer);
+            }
+            else {
+              reject(result);
+            }
+          });
         } else if (type === "walk") {
+          transfer.type = 'walk';
+          let kit = new AMap.Walking(that.$store.state.AMap_Walk);
+          transfer.kit = kit;
+          kit.search(poiFrom, poiTo, function (statue, result) {
+            if(statue == 'complete'){
+              transfer.plan = result;
+              transfer.routes = that.drawResultOnMap(result, 0, "walk");
+              resolve(transfer);
+            }
+            else reject(result);
+          });
         } else {
         }
       });
@@ -174,10 +282,15 @@ export default {
           _pois[_pois.length - 1].detail.location,
           event.lnglat,
           "driving"
-        ).then(result => {
-          payload.transfer = result;
-          that.$store.dispatch("addPOIFromMap", payload);
-        });
+        )
+          .then(result => {
+            console.log(result);
+            payload.transfer = result;
+            that.$store.dispatch("addPOIFromMap", payload);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       } else {
         //提交至vuex
         that.$store.dispatch("addPOIFromMap", payload);
