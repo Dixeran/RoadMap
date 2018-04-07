@@ -16,23 +16,28 @@
           <i class="iconfont icon-minus"></i>
         </a>
       </div>
-      <div id="total">
+      <div id="total" @click="$emit('updateTransferPlan', 5, 5)">
         共{{$store.state.totalDays}}天
       </div>
     </div>
     <div id="paths">
       <ul>
-        <template v-for="item in $store.state.POIs[$store.state.nowDay]">
+        <template v-for="(item, index) in $store.state.POIs[$store.state.nowDay]">
           <div class="nodeCard" :key="item.name">
             <!--换乘选择-->
             <div class="cd-select-group" v-if="item.transfer">
-              <select name="cd-method" class="cd-select" v-model="item.transfer.type">
-                <option v-for="option in transPlan" v-bind:value="option.data">
+              <select name="cd-method" class="cd-select"
+                      v-model="item.transfer.type"
+                      @change="$emit('updateTransferPlan', index, item.transfer.type)">
+                <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
                   {{option.name}}
                 </option>
               </select>
-              <select name="cd-plan" class="cd-select" v-model="item.transfer.index">
-                <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)" v-bind:value="n - 1">
+              <select name="cd-plan" class="cd-select"
+                      v-model="item.transfer.index">
+                <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)"
+                        v-bind:value="n - 1"
+                        :key="n">
                   方案{{n}}
                 </option>
               </select>
@@ -86,6 +91,9 @@ export default {
         }
       ]
     };
+  },
+  methods:{
+
   }
 };
 </script>

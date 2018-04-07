@@ -19,6 +19,24 @@ export default {
       map: {}
     };
   },
+  created: function() {
+    let that = this;
+    this.$parent.$on("updateTransferPlan", function(itemIndex, type) {
+      let m_From =
+        that.$store.state.POIs[that.$store.state.nowDay][itemIndex - 1].detail
+          .location;
+      let m_To =
+        that.$store.state.POIs[that.$store.state.nowDay][itemIndex].detail
+          .location;
+      that.createTransferObj(m_From, m_To, type).then(newTransfer => {
+        that.$store.commit({
+          type: "updateTransfer",
+          newTransfer: newTransfer,
+          index: itemIndex
+        });
+      });
+    });
+  },
   mounted: function() {
     /*Create Map*/
     let map = new AMap.Map("map", {
@@ -87,7 +105,8 @@ export default {
     drawResultOnMap(result, index, type) {
       let that = this;
       let routes = [];
-      if (type === "driving") {//driving plan
+      if (type === "driving") {
+        //driving plan
         let routesPoints = [];
         for (let t = 0; t < result.routes[index].steps.length; t++) {
           //遍历子路段
@@ -108,7 +127,8 @@ export default {
         });
         routes.push(_route);
         return routes;
-      } else if (type === "bus") {//bus plan
+      } else if (type === "bus") {
+        //bus plan
         let plan = result.plans[index];
         for (let i = 0; i < plan.segments.length; i++) {
           let _route = new AMap.Polyline({
@@ -125,13 +145,12 @@ export default {
           routes.push(_route);
         }
         return routes;
-      }
-      else if (type === 'ride'){
+      } else if (type === "ride") {
         let plan = result.routes[index];
         let routesPoints = [];
-        for(let i = 0; i < plan.steps.length; i++){
-          for(let j = 0; j < plan.steps[i].path.length; j++){
-            routesPoints.push(plan.steps[i].path[j])
+        for (let i = 0; i < plan.rides.length; i++) {
+          for (let j = 0; j < plan.rides[i].path.length; j++) {
+            routesPoints.push(plan.rides[i].path[j]);
           }
         }
         let _route = new AMap.Polyline({
@@ -146,13 +165,12 @@ export default {
         });
         routes.push(_route);
         return routes;
-      }
-      else if(type === 'walk'){
+      } else if (type === "walk") {
         let plan = result.routes[index];
         let routesPoints = [];
-        for(let i = 0; i < plan.steps.length; i++){
-          for(let j = 0; j < plan.steps[i].path.length; j++){
-            routesPoints.push(plan.steps[i].path[j])
+        for (let i = 0; i < plan.steps.length; i++) {
+          for (let j = 0; j < plan.steps[i].path.length; j++) {
+            routesPoints.push(plan.steps[i].path[j]);
           }
         }
         let _route = new AMap.Polyline({
@@ -171,7 +189,8 @@ export default {
     },
     /**
      * @description 生成路径规划结果
-     * @param {poi object} poi 高德POI对象
+     * @param {lnglat object} poiFrom 高德lnglat
+     * @param {lnglat object} poiTo 高德lnglat
      * @param {string} type 路径规划类别
      * @return {transfer object} transfer对象
      */
@@ -215,30 +234,28 @@ export default {
             }
           });
         } else if (type === "ride") {
-          transfer.type = 'rede';
+          transfer.type = "ride";
           let kit = new AMap.Riding(that.$store.state.AMap_Ride);
           transfer.kit = kit;
-          kit.search(poiFrom, poiTo, function (statue, result) {
-            if(statue == 'complete'){
+          kit.search(poiFrom, poiTo, function(statue, result) {
+            if (statue == "complete") {
               transfer.plan = result;
               transfer.routes = that.drawResultOnMap(result, 0, "ride");
               resolve(transfer);
-            }
-            else {
+            } else {
               reject(result);
             }
           });
         } else if (type === "walk") {
-          transfer.type = 'walk';
+          transfer.type = "walk";
           let kit = new AMap.Walking(that.$store.state.AMap_Walk);
           transfer.kit = kit;
-          kit.search(poiFrom, poiTo, function (statue, result) {
-            if(statue == 'complete'){
+          kit.search(poiFrom, poiTo, function(statue, result) {
+            if (statue == "complete") {
               transfer.plan = result;
               transfer.routes = that.drawResultOnMap(result, 0, "walk");
               resolve(transfer);
-            }
-            else reject(result);
+            } else reject(result);
           });
         } else {
         }

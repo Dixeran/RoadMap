@@ -80,7 +80,7 @@ const store = new Vuex.Store({
         for (var i = 0; i < nowP.length; i++) {
           nowP[i].marker.hide(); //hide marker
           if (nowP[i].transfer) {
-            for (z in nowP[z].transfer.routes) {
+            for(let z = 0; z < nowP[i].transfer.routes.length; z++){
               nowP[i].transfer.routes[z].hide(); //hide path
             }
           }
@@ -89,8 +89,8 @@ const store = new Vuex.Store({
         for (var j = 0; j < newP.length; j++) {
           newP[j].marker.show(); //show marker
           if (newP[j].transfer) {
-            for (z in newP[j].transfer.routes) {
-              newP[j].transfer.routes[z].show();
+            for(let z = 0; z < newP[j].transfer.routes.length; z++){
+              newP[j].transfer.routes[z].show(); //hide path
             }
           }
         }
@@ -129,6 +129,13 @@ const store = new Vuex.Store({
      */
     addPOIFromMap(state, payload) {
       state.POIs[state.nowDay].push(payload);
+    },
+    updateTransfer:function (state, payload) {
+      let route = state.POIs[state.nowDay][payload.index].transfer.routes;
+      for(let i = 0; i < route.length; i++){
+        route[i].hide();
+      }
+      state.POIs[state.nowDay][payload.index].transfer = payload.newTransfer;
     }
   },
   actions: {
