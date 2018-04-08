@@ -34,7 +34,8 @@
                 </option>
               </select>
               <select name="cd-plan" class="cd-select"
-                      v-model="item.transfer.index">
+                      v-model="item.transfer.index"
+                      @change="$emit('updateTransferIndex', index, item.transfer.index)">
                 <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)"
                         v-bind:value="n - 1"
                         :key="n">
@@ -161,7 +162,7 @@ export default {
   width: 100%;
   height: calc(100% - 3rem);
   overflow-y: auto;
-  background-color: #f1f1f1;
+  background-image: url("/static/seigaiha.png");
 }
 
 #paths > ul {

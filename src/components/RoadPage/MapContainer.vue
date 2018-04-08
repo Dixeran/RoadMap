@@ -21,6 +21,11 @@ export default {
   },
   created: function() {
     let that = this;
+    /**
+     * @description 更新指定节点的出行方案
+     * @param {number} itemIndex 指定节点的索引
+     * @param {string} type 出行类型
+     * */
     this.$parent.$on("updateTransferPlan", function(itemIndex, type) {
       let m_From =
         that.$store.state.POIs[that.$store.state.nowDay][itemIndex - 1].detail
@@ -30,11 +35,22 @@ export default {
           .location;
       that.createTransferObj(m_From, m_To, type).then(newTransfer => {
         that.$store.commit({
-          type: "updateTransfer",
+          type: "updateTransferPlan",
           newTransfer: newTransfer,
           index: itemIndex
         });
       });
+    });
+
+    this.$parent.$on('updateTransferIndex', function (itemIndex, transferIndex) {
+      let result = that.$store.state.POIs[that.$store.state.nowDay][itemIndex].transfer;
+      let newRoutes = that.drawResultOnMap(result.plan, transferIndex, result.type);
+      that.$store.commit({
+        type:'updateTransferIndex',
+        newRoutes:newRoutes,
+        index:itemIndex,
+        transferIndex:transferIndex
+      })
     });
   },
   mounted: function() {
@@ -98,7 +114,7 @@ export default {
     },
     /**
      * @description 根据type将result的路径画出
-     * @param {search result} result 搜索结果
+     * @param {object} result 搜索结果
      * @param {string} type 搜索类型
      * @param {number} index 方案索引
      */
@@ -189,10 +205,10 @@ export default {
     },
     /**
      * @description 生成路径规划结果
-     * @param {lnglat object} poiFrom 高德lnglat
-     * @param {lnglat object} poiTo 高德lnglat
+     * @param {object} poiFrom 高德lnglat对象
+     * @param {object} poiTo 高德lnglat对象
      * @param {string} type 路径规划类别
-     * @return {transfer object} transfer对象
+     * @return {object} transfer对象
      */
     createTransferObj: function(poiFrom, poiTo, type) {
       let that = this;
@@ -263,7 +279,7 @@ export default {
     },
     /**
      * @description 增加POI到总列表
-     * @param {POI event} event 事件obj
+     * @param {object} event 事件obj
      */
     addPOIToData: function(event) {
       /*校验是否已存在id*/

@@ -122,6 +122,7 @@ const store = new Vuex.Store({
       }
     },
     /**
+     * @description 添加POI到数据集
      * @param {obj} payload
      * @param {String} payload.id POI唯一编号
      * @param {pointer} payload.marker 地图上标记物的引用
@@ -130,12 +131,30 @@ const store = new Vuex.Store({
     addPOIFromMap(state, payload) {
       state.POIs[state.nowDay].push(payload);
     },
-    updateTransfer:function (state, payload) {
+    /**
+     * @description 更新POI出行方案
+     * @param {object} payload
+     * @param {number} payload.index POI当日索引
+     * @param {object} payload.newTransfer POI新transfer
+     */
+    updateTransferPlan:function (state, payload) {
       let route = state.POIs[state.nowDay][payload.index].transfer.routes;
       for(let i = 0; i < route.length; i++){
         route[i].hide();
       }
       state.POIs[state.nowDay][payload.index].transfer = payload.newTransfer;
+    },
+    /**
+     * @description 更新POI出行方案索引
+     * @param {object} payload
+     * @param {number} payload.index POI当日索引
+     * @param {object} payload.newRoutes POI新transfer.routes
+     * @param {number} payload.transferIndex POI出行方案索引
+     */
+    updateTransferIndex:function (state, payload) {
+      let item = state.POIs[state.nowDay][payload.index];
+      item.transfer.routes = payload.newRoutes;
+      item.transfer.index = payload.transferIndex;
     }
   },
   actions: {
