@@ -42,15 +42,70 @@ export default {
       });
     });
 
-    this.$parent.$on('updateTransferIndex', function (itemIndex, transferIndex) {
-      let result = that.$store.state.POIs[that.$store.state.nowDay][itemIndex].transfer;
-      let newRoutes = that.drawResultOnMap(result.plan, transferIndex, result.type);
+    /*修改出行计划索引*/
+    this.$parent.$on("updateTransferIndex", function(itemIndex, transferIndex) {
+      let result =
+        that.$store.state.POIs[that.$store.state.nowDay][itemIndex].transfer;
+      let newRoutes = that.drawResultOnMap(
+        result.plan,
+        transferIndex,
+        result.type
+      );
       that.$store.commit({
-        type:'updateTransferIndex',
-        newRoutes:newRoutes,
-        index:itemIndex,
-        transferIndex:transferIndex
-      })
+        type: "updateTransferIndex",
+        newRoutes: newRoutes,
+        index: itemIndex,
+        transferIndex: transferIndex
+      });
+    });
+
+    /*移动地图到指定点*/
+    this.$parent.$on("setCenter", function(index) {
+      let position = that.$store.state.POIs[that.$store.state.nowDay][
+        index
+      ].marker.getPosition();
+      that.map.panTo(position);
+    });
+
+    /*移动地图到指定天*/
+    this.$parent.$on("moveTo", function(index, day) {
+      let cache = that.$store.state.POIs[that.$store.state.nowDay][index];
+      cache.marker.hide();
+      for (let i = 0; cache.transfer && i < cache.transfer.routes.length; i++) {
+        cache.transfer.routes[i].hide();
+      }
+      that.$store.commit("wipe", index); //wipe from nowDay
+      if (day === null) {
+        //delete
+        cache = null;
+        let locFrom =
+          that.$store.state.POIs[that.$store.state.nowDay][index - 1] || null;
+        let locTo =
+          that.$store.state.POIs[that.$store.state.nowDay][index] || null;
+        if (locFrom && locTo) {//有前驱和后继
+          that
+            .createTransferObj(
+              locFrom.detail.location,
+              locTo.detail.location,
+              locTo.transfer.type
+            )
+            .then(result => {
+              that.$store.commit({
+                type: "updateTransferPlan",
+                newTransfer: result,
+                index: index
+              });
+            });
+        } else if (locTo) {//只有后继
+          that.$store.commit({
+            type: "updateTransferPlan",
+            newTransfer: null,
+            index: index
+          });
+        }
+      } else {
+        //move to
+      }
     });
   },
   mounted: function() {
@@ -59,6 +114,7 @@ export default {
       resizeEnable: true,
       zoom: 11,
       center: [116.397428, 39.90923],
+      animateEnable: true,
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
     this.map = map; //全局保存map

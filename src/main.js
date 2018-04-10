@@ -155,6 +155,13 @@ const store = new Vuex.Store({
       let item = state.POIs[state.nowDay][payload.index];
       item.transfer.routes = payload.newRoutes;
       item.transfer.index = payload.transferIndex;
+    },
+    /**
+     * @description 从nowday删除index
+     * @param {number} index 待删除POI索引
+     */
+    wipe:function (state, index) {
+      state.POIs[state.nowDay].splice(index, 1);
     }
   },
   actions: {

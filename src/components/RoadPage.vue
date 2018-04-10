@@ -1,7 +1,9 @@
 <template>
   <div id="Roadpage">
     <Mapcontainer/>
-    <Detailpath @updateTransferPlan="updateTransferPlan"/>
+    <Detailpath @updateTransferPlan="updateTransferPlan"
+                @setCenter="setCenter"
+                @moveTo="moveTo"/>
   </div>
 </template>
 
@@ -32,6 +34,12 @@ export default {
      */
     updateTransferIndex:function (itemIndex, transferIndex) {
       this.$emit('updateTransferIndex', itemIndex, transferIndex);
+    },
+    setCenter:function (index) {
+      this.$emit('setCenter', index);
+    },
+    moveTo:function (index, day) {
+      this.$emit('moveTo', index, day);
     }
   }
 };

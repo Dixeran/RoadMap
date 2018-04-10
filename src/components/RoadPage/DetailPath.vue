@@ -57,9 +57,9 @@
             </div>
             <!--底部操作-->
             <div class="cd-footer">
-              <a href="#"><i class="iconfont icon-androidlocate"></i></a>
-              <a href="#"><i class="iconfont icon-move"></i></a>
-              <a href="#"><i class="iconfont icon-delete color-alert"></i></a>
+              <button href="#" @click="$emit('setCenter', index)"><i class="iconfont icon-androidlocate"></i></button>
+              <button href="#"><i class="iconfont icon-move"></i></button>
+              <button href="#" @click="$emit('moveTo', index, null)"><i class="iconfont icon-delete color-alert"></i></button>
             </div>
           </div>
         </template>
@@ -100,6 +100,10 @@ export default {
 </script>
 
 <style scoped>
+button:focus{
+  outline:none;
+}
+
 #Detailpath {
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   overflow-y: hidden;
@@ -162,7 +166,7 @@ export default {
   width: 100%;
   height: calc(100% - 3rem);
   overflow-y: auto;
-  background-image: url("/static/seigaiha.png");
+  background-image: url("/static/trangle.png");
 }
 
 #paths > ul {
@@ -192,10 +196,12 @@ export default {
 }
 
 .cd-main {
+  margin: 10px;
   color: white;
   background-color: #2384b8;
   border-left: #4d8eb1 1rem solid;
   border-radius: 2px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 .cd-main > div[type="simple"] {
   padding: 5px;
@@ -222,14 +228,21 @@ export default {
   align-content: center;
   justify-content: center;
 }
-.cd-footer > a {
+.cd-footer > button {
   text-decoration: none;
   color: #333;
+  background-color: white;
+  border: none;
   flex: 1 1 auto;
   text-align: center;
+  transition: all 0.2s ease;
 }
-.cd-footer > a:hover {
+.cd-footer > button:hover {
   background-color: whitesmoke;
+}
+.cd-footer > button:active{
+  background-color: #c3c3c3;
+  color: #333;
 }
 .color-alert {
   color: #e2414c;
