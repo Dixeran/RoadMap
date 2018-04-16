@@ -105,8 +105,8 @@ const store = new Vuex.Store({
       if (d < state.totalDays && d >= 0) {
         for (let t = 0; t < state.POIs[d].length; t++) {
           state.POIs[d][t].marker.hide(); //hide markers
-          if (state.POIs[d][t].transfer.routes.hide)
-            state.POIs[d][t].transfer.routes.hide(); //hide path
+          if (state.POIs[d][t].transfer)
+            state.POIs[d][t].transfer.routes.hide(); //hide path TODO:
         }
         state.POIs.splice(d, 1);
         state.totalDays--;
@@ -114,7 +114,7 @@ const store = new Vuex.Store({
           state.nowDay--;
           for (let i = 0; i < state.POIs[state.nowDay].length; i++) {
             state.POIs[state.nowDay][i].marker.show();
-            if (state.POIs[state.nowDay][i].transfer.routes.show) {
+            if (state.POIs[state.nowDay][i].transfer) {
               state.POIs[state.nowDay][i].transfer.routes.show();
             }
           }
@@ -123,13 +123,15 @@ const store = new Vuex.Store({
     },
     /**
      * @description 添加POI到数据集
-     * @param {obj} payload
-     * @param {String} payload.id POI唯一编号
-     * @param {pointer} payload.marker 地图上标记物的引用
-     * @param {*} payload.transfer 地图上路线规划的引用
+     * @param {object} payload
+     * @param {object} payload.data 数据
+     * @param {number} payload.datTo 可选，添加到的天
      */
     addPOIFromMap(state, payload) {
-      state.POIs[state.nowDay].push(payload);
+      if(!payload.datTo){
+        state.POIs[state.nowDay].push(payload.data);
+      }
+      else state.POIs[payload.datTo].push(payload.data);//move to
     },
     /**
      * @description 更新POI出行方案
@@ -167,18 +169,23 @@ const store = new Vuex.Store({
   actions: {
     addPOIFromMap(context, payload) {
       console.log(payload);
-      context.state.AMap_PlaceSearch.search.getDetails(payload.id, function(
-        status,
-        result
-      ) {
-        if (status == "complete") {
-          payload.detail = result.poiList.pois[0];
-          context.commit("addPOIFromMap", payload);
-        } else {
-          console.log(result);
-          context.commit("addPOIFromMap", payload);
-        }
-      });
+      if(!payload.data.detail){//no detail
+        context.state.AMap_PlaceSearch.search.getDetails(payload.data.id, function(
+          status,
+          result
+        ) {
+          if (status == "complete") {
+            payload.data.detail = result.poiList.pois[0];
+            context.commit("addPOIFromMap", payload);
+          } else {
+            console.log(result);
+            context.commit("addPOIFromMap", payload);
+          }
+        });
+      }
+      else {//already exist data
+        context.commit("addPOIFromMap", payload);
+      }
     }
   }
 });

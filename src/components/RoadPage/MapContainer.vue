@@ -105,6 +105,28 @@ export default {
         }
       } else {
         //move to
+        let newDay = that.$store.state.POIs[day];
+        if(newDay.length != 0){//有前驱
+          let locFrom = newDay[newDay.length - 1].detail.location;//last
+          let locTo = cache.detail.location;
+          that.createTransferObj(locFrom, locTo, "driving").then(result=>{
+            cache.transfer = result;
+            for(let i = 0; i < result.routes.length; i++) result.routes[i].hide();
+            that.$state.dispatch({
+              type:"addPOIFromMap",
+              data:cache,
+              dayTo:day
+            });
+          })
+        }
+        else{//没前驱
+          cache.transfer = null;
+          that.$state.dispatch({
+            type:"addPOIFromMap",
+            data:cache,
+            dayTo:day
+          });
+        }
       }
     });
   },
@@ -375,14 +397,20 @@ export default {
           .then(result => {
             console.log(result);
             payload.transfer = result;
-            that.$store.dispatch("addPOIFromMap", payload);
+            that.$store.dispatch({
+              type:"addPOIFromMap",
+              data:payload
+            });
           })
           .catch(error => {
             console.log(error);
           });
       } else {
         //提交至vuex
-        that.$store.dispatch("addPOIFromMap", payload);
+        that.$store.dispatch({
+          type:"addPOIFromMap",
+          data:payload
+        });
       }
     }
   }

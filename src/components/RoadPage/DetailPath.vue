@@ -21,7 +21,7 @@
       </div>
     </div>
     <div id="paths">
-      <ul>
+      <ul id="nodex">
         <template v-for="(item, index) in $store.state.POIs[$store.state.nowDay]">
           <div class="nodeCard" :key="item.name">
             <!--换乘选择-->
@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import Sortable from "sortablejs";
 export default {
   name: "Detailpath",
   data() {
@@ -93,15 +94,29 @@ export default {
       ]
     };
   },
-  methods:{
-
+  methods: {},
+  updated: function() {
+    let that = this;
+    let container = document.getElementById('nodex');
+    let sort = Sortable.create(container, {
+      animation:120,
+      handle:'.cd-main',
+      draggable:".nodeCard",
+      supportPointer: false,
+      onStart:function (e) {
+        that.$emit('drag');
+      },
+      onEnd:function (e) {
+        //that.$emit('drag');
+      }
+    });
   }
 };
 </script>
 
 <style scoped>
-button:focus{
-  outline:none;
+button:focus {
+  outline: none;
 }
 
 #Detailpath {
@@ -240,7 +255,7 @@ button:focus{
 .cd-footer > button:hover {
   background-color: whitesmoke;
 }
-.cd-footer > button:active{
+.cd-footer > button:active {
   background-color: #c3c3c3;
   color: #333;
 }

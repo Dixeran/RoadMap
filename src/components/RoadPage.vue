@@ -1,20 +1,29 @@
 <template>
   <div id="Roadpage">
     <Mapcontainer/>
+    <Daytransmit v-if="onDrag"/>
     <Detailpath @updateTransferPlan="updateTransferPlan"
                 @setCenter="setCenter"
-                @moveTo="moveTo"/>
+                @moveTo="moveTo"
+                @drag="onDrag = !onDrag"/>
   </div>
 </template>
 
 <script>
 import Detailpath from "./RoadPage/DetailPath";
 import Mapcontainer from "./RoadPage/MapContainer";
+import Daytransmit from "./RoadPage/DayTransmit";
 export default {
   name: "Roadpage",
   components: {
     Detailpath,
-    Mapcontainer
+    Mapcontainer,
+    Daytransmit
+  },
+  data(){
+    return{
+      onDrag:false
+    }
   },
   methods:{
     /**
@@ -56,6 +65,13 @@ export default {
   width: calc(100% - 400px);
   height: 100%;
   display: inline-block;
+}
+
+#Daytransmit{
+  width: 7rem;
+  position: fixed;
+  top: 60px;
+  right: 400px;
 }
 
 #Detailpath {
