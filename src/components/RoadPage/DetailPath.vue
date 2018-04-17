@@ -23,7 +23,7 @@
     <div id="paths">
       <ul id="nodex">
         <template v-for="(item, index) in $store.state.POIs[$store.state.nowDay]">
-          <div class="nodeCard" :key="item.name">
+          <div class="nodeCard" :key="item.name" :index="index">
             <!--换乘选择-->
             <div class="cd-select-group" v-if="item.transfer">
               <select name="cd-method" class="cd-select"
@@ -107,7 +107,10 @@ export default {
         that.$emit('drag');
       },
       onEnd:function (e) {
-        //that.$emit('drag');
+        that.$emit('drag');
+      },
+      setData:function (dataTransfer, element) {
+        dataTransfer.setData("ItemIndex", element.getAttribute('index'));
       }
     });
   }

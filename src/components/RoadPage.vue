@@ -1,7 +1,7 @@
 <template>
   <div id="Roadpage">
     <Mapcontainer/>
-    <Daytransmit v-if="onDrag"/>
+    <Daytransmit v-if="onDrag" @moveTo="moveTo"/>
     <Detailpath @updateTransferPlan="updateTransferPlan"
                 @setCenter="setCenter"
                 @moveTo="moveTo"

@@ -125,13 +125,13 @@ const store = new Vuex.Store({
      * @description 添加POI到数据集
      * @param {object} payload
      * @param {object} payload.data 数据
-     * @param {number} payload.datTo 可选，添加到的天
+     * @param {number} payload.dayTo 可选，添加到的天
      */
     addPOIFromMap(state, payload) {
-      if(!payload.datTo){
+      if(!payload.dayTo){
         state.POIs[state.nowDay].push(payload.data);
       }
-      else state.POIs[payload.datTo].push(payload.data);//move to
+      else state.POIs[payload.dayTo].push(payload.data);//move to
     },
     /**
      * @description 更新POI出行方案
@@ -184,6 +184,8 @@ const store = new Vuex.Store({
         });
       }
       else {//already exist data
+        console.log("moveIN");
+        console.log(payload.dayTo);
         context.commit("addPOIFromMap", payload);
       }
     }

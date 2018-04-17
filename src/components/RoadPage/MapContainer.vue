@@ -112,7 +112,7 @@ export default {
           that.createTransferObj(locFrom, locTo, "driving").then(result=>{
             cache.transfer = result;
             for(let i = 0; i < result.routes.length; i++) result.routes[i].hide();
-            that.$state.dispatch({
+            that.$store.dispatch({
               type:"addPOIFromMap",
               data:cache,
               dayTo:day
@@ -121,7 +121,7 @@ export default {
         }
         else{//没前驱
           cache.transfer = null;
-          that.$state.dispatch({
+          that.$store.dispatch({
             type:"addPOIFromMap",
             data:cache,
             dayTo:day
