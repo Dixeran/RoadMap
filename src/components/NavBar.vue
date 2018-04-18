@@ -29,6 +29,7 @@ export default {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
+  z-index: 10000;
 }
 
 #logo {

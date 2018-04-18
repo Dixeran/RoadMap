@@ -1,11 +1,13 @@
 <template>
   <div id="Daytransmit">
+    <div class="header">拖动至此处分发到其他日期</div>
     <ul>
       <div class="item" v-for="n in $store.state.totalDays"
+           v-if="(n-1) != $store.state.nowDay"
             @dragover.prevent
             @drop.prevent="moveTo($event)"
             :dayIndex="n - 1">
-        <div class="item-line" v-if="n != 1"></div>
+        <div class="item-line" v-if="n != 1 && !((n-2) == $store.state.nowDay && (n-1) == 1)"></div>
         <i class="item-icon iconfont icon-right"></i>
         第{{n}}天
       </div>
@@ -33,12 +35,19 @@ export default {
   background-color: whitesmoke;
   border: 1px dashed rgba(0, 0, 0, 0.25);
   border-right: none;
+  border-radius: 0 5px;
 }
 #Daytransmit > ul {
   display: flex;
   flex-direction: column;
   padding: 0 1rem;
   margin: 0;
+}
+#Daytransmit > .header {
+  text-align: center;
+  font-size: 0.8rem;
+  background-color: white;
+  border-bottom: 1px dashed grey;
 }
 .item {
   position: relative;

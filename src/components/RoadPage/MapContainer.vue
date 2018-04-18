@@ -82,7 +82,8 @@ export default {
           that.$store.state.POIs[that.$store.state.nowDay][index - 1] || null;
         let locTo =
           that.$store.state.POIs[that.$store.state.nowDay][index] || null;
-        if (locFrom && locTo) {//有前驱和后继
+        if (locFrom && locTo) {
+          //有前驱和后继
           that
             .createTransferObj(
               locFrom.detail.location,
@@ -96,7 +97,8 @@ export default {
                 index: index
               });
             });
-        } else if (locTo) {//只有后继
+        } else if (locTo) {
+          //只有后继
           that.$store.commit({
             type: "updateTransferPlan",
             newTransfer: null,
@@ -105,26 +107,55 @@ export default {
         }
       } else {
         //move to
-        let newDay = that.$store.state.POIs[day];
-        if(newDay.length != 0){//有前驱
-          let locFrom = newDay[newDay.length - 1].detail.location;//last
-          let locTo = cache.detail.location;
-          that.createTransferObj(locFrom, locTo, "driving").then(result=>{
-            cache.transfer = result;
-            for(let i = 0; i < result.routes.length; i++) result.routes[i].hide();
-            that.$store.dispatch({
-              type:"addPOIFromMap",
-              data:cache,
-              dayTo:day
+        let locFrom =
+          that.$store.state.POIs[that.$store.state.nowDay][index - 1] || null;
+        let locTo =
+          that.$store.state.POIs[that.$store.state.nowDay][index] || null;
+        if (locFrom && locTo) {
+          //有前驱和后继
+          that
+            .createTransferObj(
+              locFrom.detail.location,
+              locTo.detail.location,
+              locTo.transfer.type
+            )
+            .then(result => {
+              that.$store.commit({
+                type: "updateTransferPlan",
+                newTransfer: result,
+                index: index
+              });
             });
-          })
+        } else if (locTo) {
+          //只有后继
+          that.$store.commit({
+            type: "updateTransferPlan",
+            newTransfer: null,
+            index: index
+          });
         }
-        else{//没前驱
+        let newDay = that.$store.state.POIs[day];
+        if (newDay.length != 0) {
+          //有前驱
+          let locFrom = newDay[newDay.length - 1].detail.location; //last
+          let locTo = cache.detail.location;
+          that.createTransferObj(locFrom, locTo, "driving").then(result => {
+            cache.transfer = result;
+            for (let i = 0; i < result.routes.length; i++)
+              result.routes[i].hide();
+            that.$store.dispatch({
+              type: "addPOIFromMap",
+              data: cache,
+              dayTo: day
+            });
+          });
+        } else {
+          //没前驱
           cache.transfer = null;
           that.$store.dispatch({
-            type:"addPOIFromMap",
-            data:cache,
-            dayTo:day
+            type: "addPOIFromMap",
+            data: cache,
+            dayTo: day
           });
         }
       }
@@ -398,8 +429,8 @@ export default {
             console.log(result);
             payload.transfer = result;
             that.$store.dispatch({
-              type:"addPOIFromMap",
-              data:payload
+              type: "addPOIFromMap",
+              data: payload
             });
           })
           .catch(error => {
@@ -408,8 +439,8 @@ export default {
       } else {
         //提交至vuex
         that.$store.dispatch({
-          type:"addPOIFromMap",
-          data:payload
+          type: "addPOIFromMap",
+          data: payload
         });
       }
     }
