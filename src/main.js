@@ -110,8 +110,8 @@ const store = new Vuex.Store({
         }
         state.POIs.splice(d, 1);
         state.totalDays--;
-        if (state.nowDay == d && state.nowDay > 0) {
-          state.nowDay--;
+        if (state.nowDay == d) {
+          if(state.nowDay > 0) state.nowDay--;
           for (let i = 0; i < state.POIs[state.nowDay].length; i++) {
             state.POIs[state.nowDay][i].marker.show();
             if (state.POIs[state.nowDay][i].transfer) {
