@@ -108,6 +108,20 @@ export default {
       },
       onEnd:function (e) {
         that.$emit('drag');
+        if (e.oldIndex !== e.newIndex) {//更改了poi顺序
+          // console.log(e.item);
+          // console.log(e.from);
+          // console.log(e.from.childNodes);
+          if(e.oldIndex < e.newIndex){//从前往后移动，恢复回去
+            let oldAfter = e.from.childNodes[e.oldIndex];//当前数组下，原来在后面的元素
+            e.from.insertBefore(e.item, oldAfter);
+          }
+          else{
+            let oldAfter = e.from.childNodes[e.oldIndex + 1] || null;
+            oldAfter ? e.from.insertBefore(e.item, oldAfter) : e.from.appendChild(e.item);
+          }
+          that.$emit('sort', e.oldIndex, e.newIndex);
+        }
       },
       setData:function (dataTransfer, element) {
         dataTransfer.setData("ItemIndex", element.getAttribute('index'));

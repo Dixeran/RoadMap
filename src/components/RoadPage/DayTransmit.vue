@@ -3,7 +3,8 @@
     <div class="header">拖动至此处分发到其他日期</div>
     <ul>
       <div class="item" v-for="n in $store.state.totalDays"
-           v-if="(n-1) != $store.state.nowDay"
+            :key="n"
+            v-if="(n-1) != $store.state.nowDay"
             @dragover.prevent
             @drop.prevent="moveTo($event)"
             :dayIndex="n - 1">
@@ -51,7 +52,6 @@ export default {
 }
 .item {
   position: relative;
-  //background-color: white;
   padding: 5px;
   text-align: center;
   margin: 1rem 0;

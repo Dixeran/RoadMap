@@ -5,7 +5,8 @@
     <Detailpath @updateTransferPlan="updateTransferPlan"
                 @setCenter="setCenter"
                 @moveTo="moveTo"
-                @drag="onDrag = !onDrag"/>
+                @drag="onDrag = !onDrag"
+                @sort="sort"/>
   </div>
 </template>
 
@@ -20,18 +21,18 @@ export default {
     Mapcontainer,
     Daytransmit
   },
-  data(){
-    return{
-      onDrag:false
-    }
+  data() {
+    return {
+      onDrag: false
+    };
   },
-  methods:{
+  methods: {
     /**
      * @description 更新路段规划的类型
      * @param {item} itemIndex 节点索引
      * @param {string} type 出行方案类型
      */
-    updateTransferPlan:function (itemIndex, type) {
+    updateTransferPlan: function(itemIndex, type) {
       this.$emit("updateTransferPlan", itemIndex, type);
       //因为item在vuex里面，直接传item好像不太方便修改vuex对象？暂时先传index
       //要通过commit来修改的话，传一个vuex里面的对象的引用似乎没啥大用
@@ -41,14 +42,17 @@ export default {
      * @param {item} itemIndex 节点索引
      * @param {number} transferIndex 出行方案索引
      */
-    updateTransferIndex:function (itemIndex, transferIndex) {
-      this.$emit('updateTransferIndex', itemIndex, transferIndex);
+    updateTransferIndex: function(itemIndex, transferIndex) {
+      this.$emit("updateTransferIndex", itemIndex, transferIndex);
     },
-    setCenter:function (index) {
-      this.$emit('setCenter', index);
+    setCenter: function(index) {
+      this.$emit("setCenter", index);
     },
-    moveTo:function (index, day) {
-      this.$emit('moveTo', index, day);
+    moveTo: function(index, day) {
+      this.$emit("moveTo", index, day);
+    },
+    sort: function(itemOldIndex, itemNewIndex) {
+      this.$emit("sort", itemOldIndex, itemNewIndex);
     }
   }
 };
@@ -67,7 +71,7 @@ export default {
   display: inline-block;
 }
 
-#Daytransmit{
+#Daytransmit {
   width: 7rem;
   position: fixed;
   top: 60px;

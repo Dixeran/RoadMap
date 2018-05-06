@@ -7,6 +7,7 @@
 
 <script>
 import Searchbar from "./SearchBar.vue";
+import index from "../../../node_modules/_vue@2.5.16@vue";
 export default {
   name: "Mapcontainer",
   components: {
@@ -134,7 +135,7 @@ export default {
             index: index
           });
         }
-        let newDay = that.$store.state.POIs[day];
+        let newDay = that.$store.state.POIs[day]; //切换到的那一天
         if (newDay.length != 0) {
           //有前驱
           let locFrom = newDay[newDay.length - 1].detail.location; //last
@@ -142,7 +143,7 @@ export default {
           that.createTransferObj(locFrom, locTo, "driving").then(result => {
             cache.transfer = result;
             for (let i = 0; i < result.routes.length; i++)
-              result.routes[i].hide();
+              result.routes[i].hide(); //切换后消除路线
             that.$store.dispatch({
               type: "addPOIFromMap",
               data: cache,
@@ -158,6 +159,75 @@ export default {
             dayTo: day
           });
         }
+      }
+    });
+
+    /*POI当日更改顺序*/
+    this.$parent.$on("sort", function(itemOldIndex, itemNewIndex) {
+      //oldIndex是带移动节点当前的位置
+      let cache =
+        that.$store.state.POIs[that.$store.state.nowDay][itemOldIndex]; //待移动节点
+      /*该节点 移动前 后方节点更新 */
+      let oldBefore =
+        that.$store.state.POIs[that.$store.state.nowDay][itemOldIndex - 1] ||
+        null;
+      let oldAfter =
+        that.$store.state.POIs[that.$store.state.nowDay][itemOldIndex + 1] ||
+        null;
+      if (oldBefore && oldAfter) {
+        //后继节点有新前驱
+        let locFrom = oldBefore.detail.location;
+        let locTo = oldAfter.detail.location;
+        that.createTransferObj(locFrom, locTo, "driving").then(result => {
+          that.$store.commit("updateTransferPlan", {
+            newTransfer: result,
+            index: itemOldIndex + 1
+          });
+        });
+      } else if (oldAfter) {
+        that.$store.commit("updateTransferPlan", {
+          newTransfer: null,
+          index: itemOldIndex + 1
+        });
+      }
+      /*移动元素到newIndex */
+      that.$store.commit("sortItem", {
+        oldIndex: itemOldIndex,
+        newIndex: itemNewIndex
+      });
+      /*该节点本身更新 */
+      let newBefore =
+        that.$store.state.POIs[that.$store.state.nowDay][itemNewIndex - 1] ||
+        null; //待移动节点 移动后 新前驱
+      if (newBefore) {
+        let locFrom = newBefore.detail.location;
+        let locTo = cache.detail.location;
+        that.createTransferObj(locFrom, locTo, "driving").then(result => {
+          that.$store.commit("updateTransferPlan", {
+            newTransfer: result,
+            index: itemNewIndex
+          });
+        });
+      } else {
+        //移动后没有前驱
+        that.$store.commit("updateTransferPlan", {
+          newTransfer: null,
+          index: itemNewIndex
+        });
+      }
+      /*该节点 移动后 后方节点更新 */
+      let newAfter =
+        that.$store.state.POIs[that.$store.state.nowDay][itemNewIndex + 1] ||
+        null;
+      if (newAfter) {
+        let locFrom = cache.detail.location;
+        let locTo = newAfter.detail.location;
+        that.createTransferObj(locFrom, locTo, "driving").then(result => {
+          that.$store.commit("updateTransferPlan", {
+            newTransfer: result,
+            index: itemNewIndex + 1
+          });
+        });
       }
     });
   },
@@ -226,6 +296,7 @@ export default {
      * @param {object} result 搜索结果
      * @param {string} type 搜索类型
      * @param {number} index 方案索引
+     * @return {array} routes 绘制了路线的数组
      */
     drawResultOnMap(result, index, type) {
       let that = this;

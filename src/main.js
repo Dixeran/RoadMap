@@ -45,13 +45,13 @@ const store = new Vuex.Store({
       hideMarkers: true,
       autoFitView: false
     },
-    AMap_Ride:{
-      hideMarkers:true,
-      autoFitView:false
+    AMap_Ride: {
+      hideMarkers: true,
+      autoFitView: false
     },
-    AMap_Walk:{
-      hideMarkers:true,
-      autoFitView:false
+    AMap_Walk: {
+      hideMarkers: true,
+      autoFitView: false
     }
   },
   mutations: {
@@ -80,7 +80,7 @@ const store = new Vuex.Store({
         for (var i = 0; i < nowP.length; i++) {
           nowP[i].marker.hide(); //hide marker
           if (nowP[i].transfer) {
-            for(let z = 0; z < nowP[i].transfer.routes.length; z++){
+            for (let z = 0; z < nowP[i].transfer.routes.length; z++) {
               nowP[i].transfer.routes[z].hide(); //hide path
             }
           }
@@ -89,7 +89,7 @@ const store = new Vuex.Store({
         for (var j = 0; j < newP.length; j++) {
           newP[j].marker.show(); //show marker
           if (newP[j].transfer) {
-            for(let z = 0; z < newP[j].transfer.routes.length; z++){
+            for (let z = 0; z < newP[j].transfer.routes.length; z++) {
               newP[j].transfer.routes[z].show(); //hide path
             }
           }
@@ -106,7 +106,7 @@ const store = new Vuex.Store({
         for (let t = 0; t < state.POIs[d].length; t++) {
           state.POIs[d][t].marker.hide(); //hide markers
           if (state.POIs[d][t].transfer)
-            state.POIs[d][t].transfer.routes.hide(); //hide path TODO:
+            state.POIs[d][t].transfer.routes.hide(); //hide path
         }
         state.POIs.splice(d, 1);
         state.totalDays--;
@@ -128,21 +128,24 @@ const store = new Vuex.Store({
      * @param {number} payload.dayTo 可选，添加到的天
      */
     addPOIFromMap(state, payload) {
-      if(!payload.dayTo){
+      if (!payload.dayTo) {
         state.POIs[state.nowDay].push(payload.data);
       }
       else state.POIs[payload.dayTo].push(payload.data);//move to
     },
     /**
-     * @description 更新POI出行方案
+     * @description 更新POI出行方案，替换整个transfer对象
      * @param {object} payload
      * @param {number} payload.index POI当日索引
      * @param {object} payload.newTransfer POI新transfer
      */
-    updateTransferPlan:function (state, payload) {
-      let route = state.POIs[state.nowDay][payload.index].transfer.routes;
-      for(let i = 0; i < route.length; i++){
-        route[i].hide();
+    updateTransferPlan: function (state, payload) {
+      if (state.POIs[state.nowDay][payload.index].transfer) {
+        console.log("clear old path");
+        let route = state.POIs[state.nowDay][payload.index].transfer.routes;
+        for (let i = 0; i < route.length; i++) {
+          route[i].hide();
+        }
       }
       state.POIs[state.nowDay][payload.index].transfer = payload.newTransfer;
     },
@@ -153,7 +156,7 @@ const store = new Vuex.Store({
      * @param {object} payload.newRoutes POI新transfer.routes
      * @param {number} payload.transferIndex POI出行方案索引
      */
-    updateTransferIndex:function (state, payload) {
+    updateTransferIndex: function (state, payload) {
       let item = state.POIs[state.nowDay][payload.index];
       item.transfer.routes = payload.newRoutes;
       item.transfer.index = payload.transferIndex;
@@ -162,15 +165,25 @@ const store = new Vuex.Store({
      * @description 从nowday删除index
      * @param {number} index 待删除POI索引
      */
-    wipe:function (state, index) {
+    wipe: function (state, index) {
       state.POIs[state.nowDay].splice(index, 1);
+    },
+    /**
+     * @description 当天内移动节点顺序
+     * @param {object} payload
+     * @param {number} payload.oldIndex 节点旧索引
+     * @param {number} payload.newIndex 节点新索引
+     */
+    sortItem: function (state, payload) {
+      let nowDay = state.POIs[state.nowDay];
+      nowDay.splice(payload.newIndex, 0, nowDay.splice(payload.oldIndex, 1)[0]);
     }
   },
   actions: {
     addPOIFromMap(context, payload) {
       console.log(payload);
-      if(!payload.data.detail){//no detail
-        context.state.AMap_PlaceSearch.search.getDetails(payload.data.id, function(
+      if (!payload.data.detail) {//no detail
+        context.state.AMap_PlaceSearch.search.getDetails(payload.data.id, function (
           status,
           result
         ) {
