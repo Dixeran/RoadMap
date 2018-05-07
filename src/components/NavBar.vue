@@ -4,7 +4,7 @@
       <span>RoadMap</span>
     </div>
     <ul id="navlist">
-      <router-link to="/" class="active">路径规划</router-link>
+      <router-link to="/">路径规划</router-link>
       <router-link to="/setting">参数设置</router-link>
     </ul>
     <input id="cityName" type="text"
@@ -17,7 +17,15 @@
 <script>
 export default {
   name: "Navbar",
-  components: {}
+  components: {},
+  data() {
+    return {
+
+    };
+  },
+  methods: {
+
+  }
 };
 </script>
 
@@ -30,6 +38,11 @@ export default {
   display: flex;
   align-items: center;
   z-index: 10000;
+}
+@media print {
+  #Navbar {
+    display: none;
+  }
 }
 
 #logo {

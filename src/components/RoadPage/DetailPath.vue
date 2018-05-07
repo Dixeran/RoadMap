@@ -36,7 +36,7 @@
               <select name="cd-plan" class="cd-select"
                       v-model="item.transfer.index"
                       @change="$emit('updateTransferIndex', index, item.transfer.index)">
-                <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)"
+                <option v-for="n in (item.transfer.plan.routes || item.transfer.plan.plans).length"
                         v-bind:value="n - 1"
                         :key="n">
                   方案{{n}}

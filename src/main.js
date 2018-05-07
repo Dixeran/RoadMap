@@ -5,7 +5,11 @@ import Vuex from "vuex";
 import App from "./App";
 import router from "./router";
 
+import ElementUI from 'element-ui';//use element-ui
+import 'element-ui/lib/theme-chalk/index.css';
+
 Vue.use(Vuex);
+Vue.use(ElementUI);
 Vue.config.productionTip = false;
 /*{
   id: '',//唯一ID
@@ -41,7 +45,7 @@ const store = new Vuex.Store({
     },
     /*公交规划*/
     AMap_Bus: {
-      city: this.city,
+      city: '',
       hideMarkers: true,
       autoFitView: false
     },

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Checklist from '@/components/CheckList'
 import Roadpage from '@/components/Roadpage'
 
 Vue.use(Router)
@@ -18,7 +18,8 @@ export default new Router({
     {
       path: '/setting',
       name: 'Setting',
-      component: HelloWorld
+      component: Checklist
     }
-  ]
+  ],
+  linkExactActiveClass:'active'
 })

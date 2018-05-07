@@ -418,6 +418,7 @@ export default {
         } else if (type === "bus") {
           //bus plan
           transfer.type = "bus";
+          that.$store.state.AMap_Bus.city = that.$store.state.city;
           let kit = new AMap.Transfer(that.$store.state.AMap_Bus);
           transfer.kit = kit;
           kit.search(poiFrom, poiTo, function(statue, result) {
