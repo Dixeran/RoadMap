@@ -18,9 +18,9 @@ Vue.config.productionTip = false;
   transfer: {
     type: '',//换乘类型
     index: number, //换乘方案索引
-    plan: {},//换乘方案
+    plan: {},//换乘方案对象
     routes:[{}],//换乘绘制路线
-    kit:{}//换乘AMap对象
+    kit:{}//换乘搜索对象
   }
 }*/
 const store = new Vuex.Store({
