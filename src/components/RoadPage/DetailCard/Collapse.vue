@@ -28,14 +28,15 @@ export default {
   data() {
     return {
       isActive: false,
-      contentHeight: 0
+      contentHeight: 0,
+      _mounted:false
     };
   },
   mounted: function() {
     if (this.$children[0]) {
       this.contentHeight =
         this.$el.clientHeight - this.$children[0].$el.clientHeight;
-      console.log(this.$el.style.height);
+      //console.log(this.$el.style.height);
     }
   },
   methods: {
@@ -46,13 +47,11 @@ export default {
       } else {
         th = this.$el.clientHeight + this.$children[0].$el.clientHeight;
       }
+      console.log(this.$el.clientHeight);
       console.log(th);
       let tween = new TWEEN.Tween(this).to({ contentHeight: th }, 200);
       tween.easing(TWEEN.Easing.Cubic.InOut);
       tween.start();
-      tween.onUpdate(function(t) {
-        console.log(t);
-      });
 
       animate();
       function animate() {
@@ -64,7 +63,12 @@ export default {
   },
   computed: {
     transferComp: function() {
+      // if(this._mounted && this.isActive) this.transActive();//中途变更类型时，先收起
+      // this._mounted = true;
       if (this.transferItem.type === "driving") return Drivedetail;
+      else if (this.transferItem.type === "walk") return Walkdetail;
+      else if (this.transferItem.type === "bus") return Busdetail;
+      return Ridedetail;
     }
   },
   watch: {

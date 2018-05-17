@@ -23,7 +23,7 @@ export default {
   created: function() {
     let that = this;
     /**
-     * @description 更新指定节点的出行方案
+     * @description 更新指定节点的出行方案类型
      * @param {number} itemIndex 指定节点的索引
      * @param {string} type 出行类型
      * */
@@ -327,13 +327,14 @@ export default {
         //bus plan
         let plan = result.plans[index];
         for (let i = 0; i < plan.segments.length; i++) {
+          let seg_type = plan.segments[i].transit_mode;
           let _route = new AMap.Polyline({
             map: that.map,
             isOutline: true,
             outlineColor: "#FFFFFF",
             strokeWeight: 5,
             strokeColor:
-              plan.segments[i].transit_mode == "BUS" ? "#2775b6" : "#fed71a",
+              seg_type == "BUS" ? "#2775b6" : (seg_type == "SUBWAY" ? "#51c4d3" : "#fed71a"),
             showDir: true,
             lineJoin: "round",
             path: plan.segments[i].transit.path

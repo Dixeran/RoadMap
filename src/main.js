@@ -145,7 +145,6 @@ const store = new Vuex.Store({
      */
     updateTransferPlan: function (state, payload) {
       if (state.POIs[state.nowDay][payload.index].transfer) {
-        console.log("clear old path");
         let route = state.POIs[state.nowDay][payload.index].transfer.routes;
         for (let i = 0; i < route.length; i++) {
           route[i].hide();
@@ -161,9 +160,15 @@ const store = new Vuex.Store({
      * @param {number} payload.transferIndex POI出行方案索引
      */
     updateTransferIndex: function (state, payload) {
+      if (state.POIs[state.nowDay][payload.index].transfer) {
+        let route = state.POIs[state.nowDay][payload.index].transfer.routes;
+        for (let i = 0; i < route.length; i++) {
+          route[i].hide();
+        }
+      }
       let item = state.POIs[state.nowDay][payload.index];
-      item.transfer.routes = payload.newRoutes;
-      item.transfer.index = payload.transferIndex;
+      state.POIs[state.nowDay][payload.index].transfer.routes = payload.newRoutes;
+      state.POIs[state.nowDay][payload.index].transfer.index = payload.transferIndex;
     },
     /**
      * @description 从nowday删除index
