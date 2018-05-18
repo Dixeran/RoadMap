@@ -32,7 +32,8 @@ const store = new Vuex.Store({
     /*地点搜索*/
     AMap_PlaceSearch: {
       config: {
-        city: "全国"
+        city: "全国",
+        extensions:'all'
       },
       search: {}
     },

@@ -47,14 +47,14 @@
               </div>
               <!-- content -->
             </Collapse>
-            <!--路程规划详情-->
-            <div class="cd-transfer"></div>
             <!--目的地详情-->
             <div class="cd-main">
-              <div type="simple" slot="header">
-                <p>{{item.detail.name}}</p>
-                <p class="sm">{{item.detail.address}}</p>
-              </div>
+              <Cardcollapse :detail="item.detail">
+                <div type="simple" slot="header">
+                  <p>{{item.detail.name}}</p>
+                  <p class="sm">{{item.detail.address}}</p>
+                </div>
+              </Cardcollapse>
             </div>
             <!--底部操作-->
             <div class="cd-footer">
@@ -72,10 +72,12 @@
 <script>
 import Sortable from "sortablejs";
 import Collapse from "./DetailCard/Collapse";
+import Cardcollapse from "./DetailCard/CardCollapse";
 export default {
   name: "Detailpath",
-  components:{
-    Collapse
+  components: {
+    Collapse,
+    Cardcollapse
   },
   data() {
     return {
@@ -227,7 +229,7 @@ button:focus {
   display: flex;
   padding: 5px;
 }
-.cd-select-group  select {
+.cd-select-group select {
   flex: 1 1 auto;
   margin: 0 16px;
   border: none;
