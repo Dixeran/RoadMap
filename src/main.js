@@ -5,7 +5,11 @@ import Vuex from "vuex";
 import App from "./App";
 import router from "./router";
 
+import ElementUI from 'element-ui';//use element-ui
+import 'element-ui/lib/theme-chalk/index.css';
+
 Vue.use(Vuex);
+Vue.use(ElementUI);
 Vue.config.productionTip = false;
 /*{
   id: '',//唯一ID
@@ -14,9 +18,9 @@ Vue.config.productionTip = false;
   transfer: {
     type: '',//换乘类型
     index: number, //换乘方案索引
-    plan: {},//换乘方案
+    plan: {},//换乘方案对象
     routes:[{}],//换乘绘制路线
-    kit:{}//换乘AMap对象
+    kit:{}//换乘搜索对象
   }
 }*/
 const store = new Vuex.Store({
@@ -28,7 +32,8 @@ const store = new Vuex.Store({
     /*地点搜索*/
     AMap_PlaceSearch: {
       config: {
-        city: "全国"
+        city: "全国",
+        extensions:'all'
       },
       search: {}
     },
@@ -41,7 +46,7 @@ const store = new Vuex.Store({
     },
     /*公交规划*/
     AMap_Bus: {
-      city: this.city,
+      city: '',
       hideMarkers: true,
       autoFitView: false
     },
@@ -110,8 +115,8 @@ const store = new Vuex.Store({
         }
         state.POIs.splice(d, 1);
         state.totalDays--;
-        if (state.nowDay == d && state.nowDay > 0) {
-          state.nowDay--;
+        if (state.nowDay == d) {
+          if(state.nowDay > 0) state.nowDay--;
           for (let i = 0; i < state.POIs[state.nowDay].length; i++) {
             state.POIs[state.nowDay][i].marker.show();
             if (state.POIs[state.nowDay][i].transfer) {
@@ -141,7 +146,6 @@ const store = new Vuex.Store({
      */
     updateTransferPlan: function (state, payload) {
       if (state.POIs[state.nowDay][payload.index].transfer) {
-        console.log("clear old path");
         let route = state.POIs[state.nowDay][payload.index].transfer.routes;
         for (let i = 0; i < route.length; i++) {
           route[i].hide();
@@ -157,9 +161,15 @@ const store = new Vuex.Store({
      * @param {number} payload.transferIndex POI出行方案索引
      */
     updateTransferIndex: function (state, payload) {
+      if (state.POIs[state.nowDay][payload.index].transfer) {
+        let route = state.POIs[state.nowDay][payload.index].transfer.routes;
+        for (let i = 0; i < route.length; i++) {
+          route[i].hide();
+        }
+      }
       let item = state.POIs[state.nowDay][payload.index];
-      item.transfer.routes = payload.newRoutes;
-      item.transfer.index = payload.transferIndex;
+      state.POIs[state.nowDay][payload.index].transfer.routes = payload.newRoutes;
+      state.POIs[state.nowDay][payload.index].transfer.index = payload.transferIndex;
     },
     /**
      * @description 从nowday删除index

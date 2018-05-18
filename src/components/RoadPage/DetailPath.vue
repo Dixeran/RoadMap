@@ -25,35 +25,36 @@
         <template v-for="(item, index) in $store.state.POIs[$store.state.nowDay]">
           <div class="nodeCard" :key="item.name" :index="index">
             <!--换乘选择-->
-            <div class="cd-select-group" v-if="item.transfer">
-              <select name="cd-method" class="cd-select"
-                      v-model="item.transfer.type"
-                      @change="$emit('updateTransferPlan', index, item.transfer.type)">
-                <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
-                  {{option.name}}
-                </option>
-              </select>
-              <select name="cd-plan" class="cd-select"
-                      v-model="item.transfer.index"
-                      @change="$emit('updateTransferIndex', index, item.transfer.index)">
-                <option v-for="n in (item.transfer.plan.routes.length || item.transfer.plan.plans.length)"
-                        v-bind:value="n - 1"
-                        :key="n">
-                  方案{{n}}
-                </option>
-              </select>
-            </div>
-            <!--路程规划详情-->
-            <div class="cd-transfer"></div>
+            <Collapse v-if="item.transfer" :transferItem="item.transfer">
+              <!-- 选择器slot -->
+              <div class="cd-select-group" slot="selector">
+                <select name="cd-method" class="cd-select"
+                        v-model="item.transfer.type"
+                        @change="$emit('updateTransferPlan', index, item.transfer.type)">
+                  <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
+                    {{option.name}}
+                  </option>
+                </select>
+                <select name="cd-plan" class="cd-select"
+                        v-model="item.transfer.index"
+                        @change="$emit('updateTransferIndex', index, item.transfer.index)">
+                  <option v-for="n in (item.transfer.plan.routes || item.transfer.plan.plans).length"
+                          v-bind:value="n - 1"
+                          :key="n">
+                    方案{{n}}
+                  </option>
+                </select>
+              </div>
+              <!-- content -->
+            </Collapse>
             <!--目的地详情-->
             <div class="cd-main">
-              <div type="simple">
-                <!--TODO:click-->
-                <span><i class="iconfont icon-more"></i></span>
-                <p>{{item.detail.name}}</p>
-                <p class="sm">{{item.detail.address}}</p>
-              </div>
-              <div type="detail"></div>
+              <Cardcollapse :detail="item.detail">
+                <div type="simple" slot="header">
+                  <p>{{item.detail.name}}</p>
+                  <p class="sm">{{item.detail.address}}</p>
+                </div>
+              </Cardcollapse>
             </div>
             <!--底部操作-->
             <div class="cd-footer">
@@ -70,8 +71,14 @@
 
 <script>
 import Sortable from "sortablejs";
+import Collapse from "./DetailCard/Collapse";
+import Cardcollapse from "./DetailCard/CardCollapse";
 export default {
   name: "Detailpath",
+  components: {
+    Collapse,
+    Cardcollapse
+  },
   data() {
     return {
       transPlan: [
@@ -97,34 +104,37 @@ export default {
   methods: {},
   updated: function() {
     let that = this;
-    let container = document.getElementById('nodex');
+    let container = document.getElementById("nodex");
     let sort = Sortable.create(container, {
-      animation:120,
-      handle:'.cd-main',
-      draggable:".nodeCard",
+      animation: 120,
+      handle: ".cd-main",
+      draggable: ".nodeCard",
       supportPointer: false,
-      onStart:function (e) {
-        that.$emit('drag');
+      onStart: function(e) {
+        that.$emit("drag");
       },
-      onEnd:function (e) {
-        that.$emit('drag');
-        if (e.oldIndex !== e.newIndex) {//更改了poi顺序
+      onEnd: function(e) {
+        that.$emit("drag");
+        if (e.oldIndex !== e.newIndex) {
+          //更改了poi顺序
           // console.log(e.item);
           // console.log(e.from);
           // console.log(e.from.childNodes);
-          if(e.oldIndex < e.newIndex){//从前往后移动，恢复回去
-            let oldAfter = e.from.childNodes[e.oldIndex];//当前数组下，原来在后面的元素
+          if (e.oldIndex < e.newIndex) {
+            //从前往后移动，恢复回去
+            let oldAfter = e.from.childNodes[e.oldIndex]; //当前数组下，原来在后面的元素
             e.from.insertBefore(e.item, oldAfter);
-          }
-          else{
+          } else {
             let oldAfter = e.from.childNodes[e.oldIndex + 1] || null;
-            oldAfter ? e.from.insertBefore(e.item, oldAfter) : e.from.appendChild(e.item);
+            oldAfter
+              ? e.from.insertBefore(e.item, oldAfter)
+              : e.from.appendChild(e.item);
           }
-          that.$emit('sort', e.oldIndex, e.newIndex);
+          that.$emit("sort", e.oldIndex, e.newIndex);
         }
       },
-      setData:function (dataTransfer, element) {
-        dataTransfer.setData("ItemIndex", element.getAttribute('index'));
+      setData: function(dataTransfer, element) {
+        dataTransfer.setData("ItemIndex", element.getAttribute("index"));
       }
     });
   }
@@ -218,9 +228,8 @@ button:focus {
 .cd-select-group {
   display: flex;
   padding: 5px;
-  border-bottom: 2px dashed whitesmoke;
 }
-.cd-select-group > select {
+.cd-select-group select {
   flex: 1 1 auto;
   margin: 0 16px;
   border: none;
@@ -235,17 +244,17 @@ button:focus {
   border-radius: 2px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
-.cd-main > div[type="simple"] {
+.cd-main div[type="simple"] {
   padding: 5px;
 }
-.cd-main > div[type="simple"] > p {
+.cd-main div[type="simple"] > p {
   margin: 0;
 }
-.cd-main > div[type="simple"] > .sm {
+.cd-main div[type="simple"] > .sm {
   font-size: 12px;
   color: rgb(202, 202, 202);
 }
-.cd-main > div[type="simple"] > span {
+.cd-main div[type="simple"] > span {
   float: right;
 }
 

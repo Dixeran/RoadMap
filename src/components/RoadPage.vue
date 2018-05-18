@@ -3,6 +3,7 @@
     <Mapcontainer/>
     <Daytransmit v-if="onDrag" @moveTo="moveTo"/>
     <Detailpath @updateTransferPlan="updateTransferPlan"
+                @updateTransferIndex="updateTransferIndex"
                 @setCenter="setCenter"
                 @moveTo="moveTo"
                 @drag="onDrag = !onDrag"
