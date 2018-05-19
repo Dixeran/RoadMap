@@ -1,6 +1,7 @@
 <template>
   <div id="Roadpage">
-    <Mapcontainer/>
+    <Mapcontainer @setLoading="setLoading"
+                  v-loading.fullscreen.lock="loading"/>
     <Daytransmit v-if="onDrag" @moveTo="moveTo"/>
     <Detailpath @updateTransferPlan="updateTransferPlan"
                 @updateTransferIndex="updateTransferIndex"
@@ -24,7 +25,8 @@ export default {
   },
   data() {
     return {
-      onDrag: false
+      onDrag: false,
+      loading: false
     };
   },
   methods: {
@@ -46,14 +48,35 @@ export default {
     updateTransferIndex: function(itemIndex, transferIndex) {
       this.$emit("updateTransferIndex", itemIndex, transferIndex);
     },
+    /**
+     * @description 设置地图中心
+     * @param {number} index 设为中心的节点
+     */
     setCenter: function(index) {
       this.$emit("setCenter", index);
     },
+    /**
+     * @description 移动节点到指定日期
+     * @param {number} index 移动的节点
+     * @param {number} day 移动到的日期
+     */
     moveTo: function(index, day) {
       this.$emit("moveTo", index, day);
     },
+    /**
+     * @description 节点单日内排序
+     * @param {number} itemOldIndex 节点旧索引
+     * @param {number} itemNewIndex 节点新索引
+     */
     sort: function(itemOldIndex, itemNewIndex) {
       this.$emit("sort", itemOldIndex, itemNewIndex);
+    },
+    /**
+     * @description 设置读取状态
+     * @param {bool} state loading状态
+     */
+    setLoading: function(state) {
+      this.loading = state;
     }
   }
 };

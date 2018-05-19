@@ -1,10 +1,11 @@
 <template>
   <div id="app">
+    <Initmodel @init="init = true"/>
     <Navbar/>
     <transition name="slide">
       <Errorhandler @click.native="errorConfirmed" v-if="error != ''" :errorData="error"/>
     </transition>
-    <keep-alive include="Roadpage" @error="HandleError">
+    <keep-alive include="Roadpage" @error="HandleError" v-show="init">
       <router-view></router-view>
     </keep-alive>
   </div>
@@ -13,11 +14,13 @@
 <script>
 import Navbar from "@/components/NavBar";
 import Errorhandler from "@/components/ErrorHandler";
+import Initmodel from "@/components/InitModel";
 export default {
   name: "App",
   components: {
     Navbar,
-    Errorhandler
+    Errorhandler,
+    Initmodel
   },
   methods: {
     errorConfirmed: function(e) {
@@ -29,14 +32,15 @@ export default {
   },
   data() {
     return {
-      error: ""
+      error: "",
+      init:false
     };
   }
 };
 </script>
 
 <style>
-@import url('//at.alicdn.com/t/font_603677_87syjhedusypsyvi.css');
+@import url("//at.alicdn.com/t/font_603677_87syjhedusypsyvi.css");
 * {
   box-sizing: border-box;
 }

@@ -240,6 +240,7 @@ export default {
       animateEnable: true,
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
+    map.setCity(this.$store.state.city);
     this.map = map; //全局保存map
 
     /*初始化地点搜索插件*/
@@ -464,6 +465,7 @@ export default {
      * @param {object} event 事件obj
      */
     addPOIToData: function(event) {
+      this.$emit('setLoading', true);
       /*校验是否已存在id*/
       let pois = this.$store.state.POIs;
       for (let i = 0; i < pois.length; i++) {
@@ -505,6 +507,7 @@ export default {
               type: "addPOIFromMap",
               data: payload
             });
+            that.$emit('setLoading', false);//set loading
           })
           .catch(error => {
             console.log(error);
@@ -515,6 +518,7 @@ export default {
           type: "addPOIFromMap",
           data: payload
         });
+        that.$emit('setLoading', false);//set loading
       }
     }
   }
