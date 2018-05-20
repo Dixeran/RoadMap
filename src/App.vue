@@ -5,7 +5,7 @@
     <transition name="slide">
       <Errorhandler @click.native="errorConfirmed" v-if="error != ''" :errorData="error"/>
     </transition>
-    <keep-alive include="Roadpage" @error="HandleError" v-show="init">
+    <keep-alive include="Roadpage" @error="HandleError" v-if="init">
       <router-view></router-view>
     </keep-alive>
   </div>

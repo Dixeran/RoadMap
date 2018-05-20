@@ -240,7 +240,7 @@ export default {
       animateEnable: true,
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
-    map.setCity(this.$store.state.city);
+    map.setCity(this.$store.state.AMap_PlaceSearch.config.city);
     this.map = map; //全局保存map
 
     /*初始化地点搜索插件*/

@@ -4,13 +4,10 @@
       <div id="select">
         <h1>去哪？(･ω´･ )</h1>
         <div id="select-or">
-          <el-select v-model="val">
-            <el-option
-            v-for="item in option"
-            :key="item.name"
-            :label="item.name"
-            :value="item.citycode"></el-option>
-          </el-select>
+          <el-cascader
+            :options="option"
+            v-model="val">
+          </el-cascader>
         </div>
       </div>
       <div id="import">
@@ -26,8 +23,13 @@ export default {
   data() {
     return {
       init: false,
-      val: "全国",
-      option: []
+      val: [],
+      option: [],
+      props: {
+        label: "name",
+        value: "name",
+        children: "districtList"
+      }
     };
   },
   mounted: function() {
@@ -35,25 +37,47 @@ export default {
     AMap.service("AMap.DistrictSearch", function() {
       let districtSearch = new AMap.DistrictSearch({
         level: "country",
-        subdistrict: 1
+        subdistrict: 2
       });
       districtSearch.search("中国", function(status, result) {
-        console.log(result);
+        that.formatArray(result.districtList[0].districtList);
+        console.log(result.districtList[0].districtList);
         that.option = result.districtList[0].districtList;
       });
     });
   },
+  methods: {
+    formatArray: function(target) {
+      let that = this;
+      target.forEach(element => {
+        if (
+          element.districtList &&
+          element.districtList.length != 0 &&
+          element.districtList[0].level != "district"
+        ) {
+          that.formatArray(element.districtList);
+        } else {
+          element.districtList = null;
+        }
+        element.label = element.value = element.name;
+        element.children = element.districtList;
+      });
+    }
+  },
   watch: {
     val: function() {
+      console.log(this.val);
+      let city = this.val[this.val.length - 1];
+      this.$store.state.city = city;
       let searchConfig = this.$store.state.AMap_PlaceSearch.config;
-      searchConfig.city = this.val;
+      searchConfig.city = city;
       let search = new AMap.PlaceSearch(searchConfig);
       this.$store.commit("setPlaceSearch", {
         config: searchConfig,
         search: search
       });
       this.init = true;
-      this.$emit('init');
+      this.$emit("init");
     }
   }
 };
@@ -87,6 +111,10 @@ export default {
 #select > h1 {
   font-size: 3rem;
   color: steelblue;
+}
+
+.el-cascader {
+  width: 100%;
 }
 
 #import > h1 {
