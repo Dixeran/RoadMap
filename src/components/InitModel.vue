@@ -6,12 +6,15 @@
         <div id="select-or">
           <el-cascader
             :options="option"
+            size="medium"
             v-model="val">
           </el-cascader>
         </div>
       </div>
       <div id="import">
         <h1>导入！</h1>
+        <el-button type="primary" @click="importLocal">本地导入</el-button>
+        <el-button plain>云端导入</el-button>
       </div>
     </div>
   </div>
@@ -32,6 +35,9 @@ export default {
       }
     };
   },
+  created:function(){
+    this.lcs.Init();
+  },
   mounted: function() {
     let that = this;
     AMap.service("AMap.DistrictSearch", function() {
@@ -41,7 +47,6 @@ export default {
       });
       districtSearch.search("中国", function(status, result) {
         that.formatArray(result.districtList[0].districtList);
-        console.log(result.districtList[0].districtList);
         that.option = result.districtList[0].districtList;
       });
     });
@@ -62,11 +67,19 @@ export default {
         element.label = element.value = element.name;
         element.children = element.districtList;
       });
+    },
+    importLocal(){
+      let data = JSON.parse(localStorage.getItem('roadmap'));
+      this.$store.state.storge.localData = data;
+      this.$store.state.city = data.city;
+      let searchConfig = this.$store.state.AMap_PlaceSearch.config;
+      searchConfig.city = data.city;
+      this.init = true;
+      this.$emit('init');
     }
   },
   watch: {
     val: function() {
-      console.log(this.val);
       let city = this.val[this.val.length - 1];
       this.$store.state.city = city;
       let searchConfig = this.$store.state.AMap_PlaceSearch.config;

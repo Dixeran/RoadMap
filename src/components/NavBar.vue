@@ -11,20 +11,73 @@
            v-model="$store.state.city"
            v-bind:class="$store.state.city == '' ? 'unName' : ''"
            placeholder="输入城市名">
+    <el-popover
+      placement="top-start"
+      trigger="hover">
+      <el-switch
+        active-text="保存至云端"
+        v-model="$store.state.storge.toCloud"
+        @change="storgeStateChange">
+      </el-switch>
+      <el-button icon="el-icon-upload" circle slot="reference" @click="save" v-loading="loading"></el-button>
+    </el-popover>
+
+    <el-dialog
+      title="登录/注册"
+      :visible.sync="dialogVisible">
+      <User @login="dialogVisible = false"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import User from "./User";
 export default {
   name: "Navbar",
-  components: {},
+  components: {
+    User
+  },
   data() {
     return {
-
+      dialogVisible: false,
+      loading: false
     };
   },
   methods: {
-
+    storgeStateChange(new_state) {
+      if (new_state) {
+        //设置上云
+        if (!this.lcs.isLogin()) {
+          this.dialogVisible = true; //未登录，弹窗
+          this.$store.state.storge.toCloud = false;
+        } else {
+          this.login_success();
+        }
+      } else {
+        //取消上云
+        this.$store.state.storge.toCloud = false;
+      }
+    },
+    login_success() {
+      this.$store.state.storge.toCloud = true;
+    },
+    save() {
+      this.loading = true;
+      if (!window.localStorage) {
+        this.$message({
+          message: "保存需要使用localstorge",
+          type: "error"
+        });
+        this.loading = false;
+      } else {
+        localStorage.setItem(
+          "roadmap",
+          JSON.stringify(this.$store.getters.exportData)
+        );
+        console.log(localStorage.getItem("roadmap"));
+        this.loading =false;
+      }
+    }
   }
 };
 </script>
@@ -35,6 +88,7 @@ export default {
   height: 60px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding-right: 10px;
   display: flex;
   align-items: center;
   z-index: 10000;
