@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style>
-@import url("//at.alicdn.com/t/font_603677_87syjhedusypsyvi.css");
+@import url("//at.alicdn.com/t/font_603677_y7a78e3f6iggb9.css");
 * {
   box-sizing: border-box;
 }

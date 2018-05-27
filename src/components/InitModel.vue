@@ -50,6 +50,9 @@ export default {
         that.option = result.districtList[0].districtList;
       });
     });
+    if(this.isMobile){
+      this.importLocal();
+    }
   },
   methods: {
     formatArray: function(target) {

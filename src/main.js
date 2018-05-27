@@ -12,6 +12,23 @@ import LCStorge from './plungins/LeanCloud'//to use Leancloud
 
 Vue.use(Vuex);
 Vue.use(ElementUI);
+if (location.search.indexOf('mobile') < 0) {
+  Vue.mixin({
+    data: function () {
+      return {
+        isMobile: false
+      }
+    }
+  });
+} else {
+  Vue.mixin({
+    data: function () {
+      return {
+        isMobile: true
+      }
+    }
+  })
+}
 Vue.use(LCStorge);
 Vue.config.productionTip = false;
 /*{

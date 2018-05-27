@@ -9,10 +9,10 @@
         <a href="#" @click="$store.commit('switchDay', $store.state.nowDay+1)">
           <i class="iconfont icon-right"></i>
         </a>
-        <a href="#" @click="$store.commit('addNewDay')">
+        <a href="#" @click="$store.commit('addNewDay')" v-if="!isMobile">
           <i class="iconfont icon-plus"></i>
         </a>
-        <a href="#" class="alert" @click="$store.commit('deleteDay', $store.state.nowDay)">
+        <a href="#" class="alert" @click="$store.commit('deleteDay', $store.state.nowDay)" v-if="!isMobile">
           <i class="iconfont icon-minus"></i>
         </a>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <div id="Mapcontainer">
     <div id="map"></div>
-    <Searchbar @searchChecked="createInfoWindow"/>
+    <Searchbar @searchChecked="createInfoWindow" v-if="!isMobile"/>
   </div>
 </template>
 

@@ -3,17 +3,19 @@
     <div id="logo">
       <span>RoadMap</span>
     </div>
-    <ul id="navlist">
+    <ul id="navlist" v-if="!isMobile">
       <router-link to="/">路径规划</router-link>
       <router-link to="/setting">参数设置</router-link>
     </ul>
     <input id="cityName" type="text"
-           v-model="$store.state.city"
-           v-bind:class="$store.state.city == '' ? 'unName' : ''"
-           placeholder="输入城市名">
+      v-if="!isMobile"
+      v-model="$store.state.city"
+      v-bind:class="$store.state.city == '' ? 'unName' : ''"
+      placeholder="输入城市名">
     <el-popover
       placement="top-start"
-      trigger="hover">
+      trigger="hover"
+      v-if="!isMobile">
       <el-switch
         active-text="保存至云端"
         v-model="$store.state.storge.toCloud"
@@ -144,5 +146,11 @@ export default {
 }
 .unName {
   border: 2px solid #f05038 !important;
+}
+
+@media screen and (max-width: 600px){
+  #Navbar{
+    height: 40px;
+  }
 }
 </style>

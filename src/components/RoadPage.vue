@@ -3,12 +3,25 @@
     <Mapcontainer @setLoading="setLoading"
                   v-loading.fullscreen.lock="loading"/>
     <Daytransmit v-if="onDrag" @moveTo="moveTo"/>
-    <Detailpath @updateTransferPlan="updateTransferPlan"
+    <Detailpath v-if="!isMobile"
+                @updateTransferPlan="updateTransferPlan"
                 @updateTransferIndex="updateTransferIndex"
                 @setCenter="setCenter"
                 @moveTo="moveTo"
                 @drag="onDrag = !onDrag"
                 @sort="sort"/>
+    <Drawer :width="300" :enable="drawerOpen" v-if="isMobile" @close="drawerOpen = false">
+      <Detailpath
+        @updateTransferPlan="updateTransferPlan"
+        @updateTransferIndex="updateTransferIndex"
+        @setCenter="setCenter"
+        @moveTo="moveTo"
+        @drag="onDrag = !onDrag"
+        @sort="sort"/>
+    </Drawer>
+    <div id="footer" v-if="isMobile" @click="drawerOpen = true">
+      <i class="iconfont icon-menu"></i>
+    </div>
   </div>
 </template>
 
@@ -16,17 +29,20 @@
 import Detailpath from "./RoadPage/DetailPath";
 import Mapcontainer from "./RoadPage/MapContainer";
 import Daytransmit from "./RoadPage/DayTransmit";
+import Drawer from "./RoadPage/Drawer";
 export default {
   name: "Roadpage",
   components: {
     Detailpath,
     Mapcontainer,
-    Daytransmit
+    Daytransmit,
+    Drawer
   },
   data() {
     return {
       onDrag: false,
-      loading: false
+      loading: false,
+      drawerOpen: false
     };
   },
   methods: {
@@ -105,5 +121,33 @@ export default {
 #Detailpath {
   width: 400px;
   display: inline-block;
+}
+
+@media screen and (max-width: 600px) {
+  #Roadpage {
+    width: 100%;
+    height: calc(100% - 40px);
+    display: flex;
+  }
+  #Mapcontainer {
+    width: 100vw;
+    height: 100%;
+  }
+  #Detailpath {
+    width: 100%;
+    height: 100%;
+  }
+  #footer{
+    position: fixed;
+    right: 10px;bottom: 10px;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    background-color: white;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>
