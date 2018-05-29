@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Initmodel @init="init = true"/>
+    <Initmodel @init="init = true" @error="HandleError"/>
     <Navbar/>
     <transition name="slide">
       <Errorhandler @click.native="errorConfirmed" v-if="error != ''" :errorData="error"/>
@@ -27,7 +27,10 @@ export default {
       this.error = "";
     },
     HandleError: function(error) {
-      this.error = error;
+      this.$notify.error({
+          title: '错误',
+          message: error
+        });
     }
   },
   data() {

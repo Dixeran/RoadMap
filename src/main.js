@@ -21,10 +21,12 @@ if (location.search.indexOf('mobile') < 0) {
     }
   });
 } else {
+  let hash = location.search.match(/email=(\w+)/)[1];
   Vue.mixin({
     data: function () {
       return {
-        isMobile: true
+        isMobile: true,
+        email:hash
       }
     }
   })
@@ -239,8 +241,6 @@ const store = new Vuex.Store({
           });
         }
         else {//already exist data
-          console.log("moveIN");
-          console.log(payload.dayTo);
           context.commit("addPOIFromMap", payload);
           resolve();
         }

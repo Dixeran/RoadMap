@@ -29,8 +29,8 @@
               <!-- 选择器slot -->
               <div class="cd-select-group" slot="selector">
                 <select name="cd-method" class="cd-select"
-                        v-model="item.transfer.type"
-                        @change="$emit('updateTransferPlan', index, item.transfer.type)">
+                        :value="item.transfer.type"
+                        @change="updateTransferPlan($event, index)">
                   <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
                     {{option.name}}
                   </option>
@@ -101,7 +101,12 @@ export default {
       ]
     };
   },
-  methods: {},
+  methods: {
+    updateTransferPlan:function(e, index){
+      let val = e.target.value;
+      this.$emit('updateTransferPlan', index, val);
+    }
+  },
   updated: function() {
     let that = this;
     let container = document.getElementById("nodex");

@@ -77,7 +77,21 @@ export default {
           JSON.stringify(this.$store.getters.exportData)
         );
         console.log(localStorage.getItem("roadmap"));
-        this.loading =false;
+        if (this.$store.state.storge.toCloud) {
+          this.lcs
+            .saveToCloud(JSON.stringify(this.$store.getters.exportData))
+            .then(result => {
+              console.log(result);
+              this.loading = false;
+            })
+            .catch(err => {
+              console.log(err);
+              this.loading = false;
+            });
+        }
+        else{
+          this.loading = false;
+        }
       }
     }
   }
@@ -148,8 +162,8 @@ export default {
   border: 2px solid #f05038 !important;
 }
 
-@media screen and (max-width: 600px){
-  #Navbar{
+@media screen and (max-width: 600px) {
+  #Navbar {
     height: 40px;
   }
 }
