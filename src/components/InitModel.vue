@@ -14,15 +14,26 @@
       <div id="import">
         <h1>导入！</h1>
         <el-button type="primary" @click="importLocal">本地导入</el-button>
-        <el-button plain>云端导入</el-button>
+        <el-button plain @click="importUser">云端导入</el-button>
       </div>
     </div>
+
+    <el-dialog
+      title="登录/注册"
+      :modal="false"
+      :visible.sync="dialogVisible">
+      <User @login="dialogVisible = false; importUser()"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import User from "./User";
 export default {
   name: "Initmodel",
+  components:{
+    User
+  },
   data() {
     return {
       init: false,
@@ -32,10 +43,11 @@ export default {
         label: "name",
         value: "name",
         children: "districtList"
-      }
+      },
+      dialogVisible: false
     };
   },
-  created:function(){
+  created: function() {
     this.lcs.Init();
   },
   mounted: function() {
@@ -50,11 +62,16 @@ export default {
         that.option = result.districtList[0].districtList;
       });
     });
-    if(this.isMobile){
-      this.importLocal();
+    if (this.isMobile) {
+      //this.importLocal();
+      this.importCloud(this.email);
     }
   },
   methods: {
+    /**
+     * @description 格式化高德行政区查询结果
+     * @param {array} target 待格式化数组
+     */
     formatArray: function(target) {
       let that = this;
       target.forEach(element => {
@@ -71,20 +88,58 @@ export default {
         element.children = element.districtList;
       });
     },
-    importLocal(){
-      let data = JSON.parse(localStorage.getItem('roadmap'));
+    /**
+     * @description 从本地导入数据
+     */
+    importLocal() {
+      let data = JSON.parse(localStorage.getItem("roadmap"));
+      if(!data){
+        this.$emit('error', '数据不存在');
+        return;
+      }
       this.$store.state.storge.localData = data;
       this.$store.state.city = data.city;
+      this.$store.state.AMap_Bus.city = data.city;
       let searchConfig = this.$store.state.AMap_PlaceSearch.config;
       searchConfig.city = data.city;
       this.init = true;
-      this.$emit('init');
+      this.$emit("init");
+    },
+    /**
+     * @description 从云端导入数据
+     * @param {string} email 处理过的邮箱
+     */
+    importCloud(email) {
+      this.lcs.getDataByEmail(email).then(result => {
+        let data = JSON.parse(result);
+        this.$store.state.storge.localData = data;
+        this.$store.state.city = data.city;
+        this.$store.state.AMap_Bus.city = data.city;
+        this.$store.state.storge.toCloud = true;
+        let searchConfig = this.$store.state.AMap_PlaceSearch.config;
+        searchConfig.city = data.city;
+        this.init = true;
+        this.$emit("init");
+      }).catch(err=>{
+        this.$emit('error', err);
+      });
+    },
+    /**
+     * @description PC端导入用户
+     */
+    importUser(){
+      if(this.lcs.isLogin()){//已登录
+        this.importCloud();
+      } else{
+        this.dialogVisible = true;
+      }
     }
   },
   watch: {
     val: function() {
       let city = this.val[this.val.length - 1];
       this.$store.state.city = city;
+      this.$store.state.AMap_Bus.city = data.city;
       let searchConfig = this.$store.state.AMap_PlaceSearch.config;
       searchConfig.city = city;
       let search = new AMap.PlaceSearch(searchConfig);
