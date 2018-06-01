@@ -216,7 +216,7 @@ button:focus {
   width: 100%;
   height: calc(100% - 3rem);
   overflow-y: auto;
-  background-image: url("/static/trangle.png");
+  background-image: url("/RoadMap/static/trangle.png");
 }
 
 #paths > ul {
