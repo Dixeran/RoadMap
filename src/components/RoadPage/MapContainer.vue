@@ -310,6 +310,7 @@ export default {
           }
           if (i != src.POIs.length - 1) that.$store.commit("switchDay", i + 1);
         }
+        that.$store.commit("switchDay", 0);
         that.$emit("setLoading", false);
       })();
     }

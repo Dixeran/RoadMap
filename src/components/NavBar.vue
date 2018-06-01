@@ -21,6 +21,7 @@
         v-model="$store.state.storge.toCloud"
         @change="storgeStateChange">
       </el-switch>
+      <el-button @click="mycode = true" v-if="$store.state.storge.toCloud">生成分享二维码</el-button>
       <el-button icon="el-icon-upload" circle slot="reference" @click="save" v-loading="loading"></el-button>
     </el-popover>
 
@@ -29,10 +30,18 @@
       :visible.sync="dialogVisible">
       <User @login="dialogVisible = false"/>
     </el-dialog>
+
+    <el-dialog
+      title="分享二维码"
+      :visible.sync="mycode"
+      @open="showCode">
+      <canvas id="qrcode"></canvas>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import Qrcode from "qrcode";
 import User from "./User";
 export default {
   name: "Navbar",
@@ -42,7 +51,8 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      loading: false
+      loading: false,
+      mycode: false
     };
   },
   methods: {
@@ -88,11 +98,20 @@ export default {
               console.log(err);
               this.loading = false;
             });
-        }
-        else{
+        } else {
           this.loading = false;
         }
       }
+    },
+    showCode() {
+      let that = this;
+      setTimeout(function() {
+        let canvas = document.getElementById("qrcode");
+        Qrcode.toCanvas(canvas, "https://dixeran.github.io/RoadMap/?type=mobile&email=" + that.lcs.getEmail() + "/", function(error) {
+          if (error) console.error(error);
+          console.log("success!");
+        });
+      }, 100);
     }
   }
 };

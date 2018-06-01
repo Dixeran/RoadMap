@@ -5,7 +5,9 @@
     </span>
     <span class="trigger" @click="transActive"><i class="iconfont icon-more"></i></span>
     <div id="content">
-      <component v-if="transferItem" :is="transferComp" :item="transferItem"></component>
+      <component v-if="transferItem" :is="transferComp" :item="transferItem">
+        <el-button type="text" size="mini" @click="enterApp">在高德地图打开</el-button>
+      </component>
     </div>
   </div>
 </template>
@@ -59,6 +61,14 @@ export default {
         TWEEN.update();
       }
       this.isActive = !this.isActive;
+    },
+    enterApp(){
+      this.transferItem.kit.searchOnAMAP(
+        {
+          origin:this.transferItem.plan.origin,
+          destination: this.transferItem.plan.destination
+        }
+      );
     }
   },
   computed: {

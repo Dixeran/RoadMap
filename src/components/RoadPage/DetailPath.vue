@@ -108,6 +108,9 @@ export default {
     }
   },
   updated: function() {
+    if(this.isMobile){
+      return;//移动端不允许拖拽排序
+    }
     let that = this;
     let container = document.getElementById("nodex");
     let sort = Sortable.create(container, {
