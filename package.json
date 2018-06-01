@@ -14,6 +14,7 @@
     "blueimp-md5": "^2.10.0",
     "element-ui": "^2.3.7",
     "leancloud-storage": "^3.6.8",
+    "qrcode": "^1.2.0",
     "sortablejs": "^1.7.0",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
