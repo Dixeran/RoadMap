@@ -139,7 +139,7 @@ export default {
     val: function() {
       let city = this.val[this.val.length - 1];
       this.$store.state.city = city;
-      this.$store.state.AMap_Bus.city = data.city;
+      this.$store.state.AMap_Bus.city = city;
       let searchConfig = this.$store.state.AMap_PlaceSearch.config;
       searchConfig.city = city;
       let search = new AMap.PlaceSearch(searchConfig);
