@@ -16,8 +16,8 @@ export default new Router({
       }
     },
     {
-      path: '/setting',
-      name: 'Setting',
+      path: '/abstract',
+      name: 'Abstract',
       component: Checklist
     }
   ],

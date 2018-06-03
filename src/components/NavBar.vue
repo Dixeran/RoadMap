@@ -5,7 +5,7 @@
     </div>
     <ul id="navlist" v-if="!isMobile">
       <router-link to="/">路径规划</router-link>
-      <router-link to="/setting">参数设置</router-link>
+      <router-link to="/abstract">行程概览</router-link>
     </ul>
     <input id="cityName" type="text"
       v-if="!isMobile"
