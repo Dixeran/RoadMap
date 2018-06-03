@@ -8,8 +8,30 @@ import router from "./router";
 import ElementUI from 'element-ui';//use element-ui
 import 'element-ui/lib/theme-chalk/index.css';
 
+import LCStorge from './plungins/LeanCloud'//to use Leancloud
+
 Vue.use(Vuex);
 Vue.use(ElementUI);
+if (location.search.indexOf('mobile') < 0) {
+  Vue.mixin({
+    data: function () {
+      return {
+        isMobile: false
+      }
+    }
+  });
+} else {
+  let hash = location.search.match(/email=(\w+)/)[1];
+  Vue.mixin({
+    data: function () {
+      return {
+        isMobile: true,
+        email:hash
+      }
+    }
+  })
+}
+Vue.use(LCStorge);
 Vue.config.productionTip = false;
 /*{
   id: '',//唯一ID
@@ -33,7 +55,7 @@ const store = new Vuex.Store({
     AMap_PlaceSearch: {
       config: {
         city: "全国",
-        extensions:'all'
+        extensions: 'all'
       },
       search: {}
     },
@@ -57,6 +79,10 @@ const store = new Vuex.Store({
     AMap_Walk: {
       hideMarkers: true,
       autoFitView: false
+    },
+    storge: {
+      toCloud: false,
+      localData: ''
     }
   },
   mutations: {
@@ -116,7 +142,7 @@ const store = new Vuex.Store({
         state.POIs.splice(d, 1);
         state.totalDays--;
         if (state.nowDay == d) {
-          if(state.nowDay > 0) state.nowDay--;
+          if (state.nowDay > 0) state.nowDay--;
           for (let i = 0; i < state.POIs[state.nowDay].length; i++) {
             state.POIs[state.nowDay][i].marker.show();
             if (state.POIs[state.nowDay][i].transfer) {
@@ -187,30 +213,64 @@ const store = new Vuex.Store({
     sortItem: function (state, payload) {
       let nowDay = state.POIs[state.nowDay];
       nowDay.splice(payload.newIndex, 0, nowDay.splice(payload.oldIndex, 1)[0]);
+    },
+    /**
+     * @description 设置存储至本地或云
+     * @param {bool} isCloud 是否上云
+     */
+    setStorgeType: function (state, isCloud) {
+      state.storge.toCloud = isCloud;
     }
   },
   actions: {
     addPOIFromMap(context, payload) {
-      console.log(payload);
-      if (!payload.data.detail) {//no detail
-        context.state.AMap_PlaceSearch.search.getDetails(payload.data.id, function (
-          status,
-          result
-        ) {
-          if (status == "complete") {
-            payload.data.detail = result.poiList.pois[0];
-            context.commit("addPOIFromMap", payload);
-          } else {
-            console.log(result);
-            context.commit("addPOIFromMap", payload);
-          }
-        });
+      return new Promise(function (resolve, reject) {
+        if (!payload.data.detail) {//no detail
+          context.state.AMap_PlaceSearch.search.getDetails(payload.data.id, function (
+            status,
+            result
+          ) {
+            if (status == "complete") {
+              payload.data.detail = result.poiList.pois[0];
+              context.commit("addPOIFromMap", payload);
+            } else {
+              console.log(result);
+              context.commit("addPOIFromMap", payload);
+            }
+            resolve();
+          });
+        }
+        else {//already exist data
+          context.commit("addPOIFromMap", payload);
+          resolve();
+        }
+      });
+    }
+  },
+  getters: {
+    /**
+     * @description 生成导出到持久化的数据
+     */
+    exportData: state => {
+      let data = {};
+      data.city = state.city;
+      data.totalDays = state.totalDays;
+      let ar = [];
+      for (let i = 0; i < state.totalDays; i++) {
+        ar.push([]);
+        for (let j = 0; j < state.POIs[i].length; j++) {
+          let poi = state.POIs[i][j];
+          ar[i].push({
+            id: poi.detail.id,
+            transfer: poi.transfer ? {
+              type: poi.transfer.type,
+              index: poi.transfer.index
+            } : null
+          });
+        }
       }
-      else {//already exist data
-        console.log("moveIN");
-        console.log(payload.dayTo);
-        context.commit("addPOIFromMap", payload);
-      }
+      data.POIs = ar;
+      return data;
     }
   }
 });

@@ -5,7 +5,9 @@
     </span>
     <span class="trigger" @click="transActive"><i class="iconfont icon-more"></i></span>
     <div id="content">
-      <component v-if="transferItem" :is="transferComp" :item="transferItem"></component>
+      <component v-if="transferItem" :is="transferComp" :item="transferItem">
+        <el-button type="text" size="mini" @click="enterApp">在高德地图打开</el-button>
+      </component>
     </div>
   </div>
 </template>
@@ -59,16 +61,28 @@ export default {
         TWEEN.update();
       }
       this.isActive = !this.isActive;
+    },
+    enterApp(){
+      this.transferItem.kit.searchOnAMAP(
+        {
+          origin:this.transferItem.plan.origin,
+          destination: this.transferItem.plan.destination
+        }
+      );
     }
   },
   computed: {
     transferComp: function() {
       // if(this._mounted && this.isActive) this.transActive();//中途变更类型时，先收起
       // this._mounted = true;
-      if (this.transferItem.type === "driving") return Drivedetail;
-      else if (this.transferItem.type === "walk") return Walkdetail;
-      else if (this.transferItem.type === "bus") return Busdetail;
-      return Ridedetail;
+      let type = this.transferItem.type;
+      if (type === "driving") return Drivedetail;
+      else if (type === "walk") return Walkdetail;
+      else if (type === "bus") return Busdetail;
+      else if (type === 'ride') return Ridedetail;
+      else{
+        console.log('errfuck');
+      }
     }
   },
   watch: {

@@ -9,10 +9,10 @@
         <a href="#" @click="$store.commit('switchDay', $store.state.nowDay+1)">
           <i class="iconfont icon-right"></i>
         </a>
-        <a href="#" @click="$store.commit('addNewDay')">
+        <a href="#" @click="$store.commit('addNewDay')" v-if="!isMobile">
           <i class="iconfont icon-plus"></i>
         </a>
-        <a href="#" class="alert" @click="$store.commit('deleteDay', $store.state.nowDay)">
+        <a href="#" class="alert" @click="$store.commit('deleteDay', $store.state.nowDay)" v-if="!isMobile">
           <i class="iconfont icon-minus"></i>
         </a>
       </div>
@@ -29,8 +29,8 @@
               <!-- 选择器slot -->
               <div class="cd-select-group" slot="selector">
                 <select name="cd-method" class="cd-select"
-                        v-model="item.transfer.type"
-                        @change="$emit('updateTransferPlan', index, item.transfer.type)">
+                        :value="item.transfer.type"
+                        @change="updateTransferPlan($event, index)">
                   <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
                     {{option.name}}
                   </option>
@@ -101,8 +101,16 @@ export default {
       ]
     };
   },
-  methods: {},
+  methods: {
+    updateTransferPlan:function(e, index){
+      let val = e.target.value;
+      this.$emit('updateTransferPlan', index, val);
+    }
+  },
   updated: function() {
+    if(this.isMobile){
+      return;//移动端不允许拖拽排序
+    }
     let that = this;
     let container = document.getElementById("nodex");
     let sort = Sortable.create(container, {
@@ -208,7 +216,7 @@ button:focus {
   width: 100%;
   height: calc(100% - 3rem);
   overflow-y: auto;
-  background-image: url("/static/trangle.png");
+  background-image: url("/RoadMap/static/trangle.png");/*TODO:chenge this when build*/
 }
 
 #paths > ul {

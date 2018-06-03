@@ -1,7 +1,7 @@
 <template>
   <div id="Mapcontainer">
     <div id="map"></div>
-    <Searchbar @searchChecked="createInfoWindow"/>
+    <Searchbar @searchChecked="createInfoWindow" v-if="!isMobile"/>
   </div>
 </template>
 
@@ -45,19 +45,7 @@ export default {
 
     /*修改出行计划索引*/
     this.$parent.$on("updateTransferIndex", function(itemIndex, transferIndex) {
-      let result =
-        that.$store.state.POIs[that.$store.state.nowDay][itemIndex].transfer;
-      let newRoutes = that.drawResultOnMap(
-        result.plan,
-        transferIndex,
-        result.type
-      );
-      that.$store.commit({
-        type: "updateTransferIndex",
-        newRoutes: newRoutes,
-        index: itemIndex,
-        transferIndex: transferIndex
-      });
+      that.updateTransferIndex(itemIndex, transferIndex);
     });
 
     /*移动地图到指定点*/
@@ -240,6 +228,7 @@ export default {
       animateEnable: true,
       mapStyle: "amap://styles/fe7d1f157e05c97d6930995928e4f39d"
     });
+    map.setCity(this.$store.state.city);
     this.map = map; //全局保存map
 
     /*初始化地点搜索插件*/
@@ -255,6 +244,77 @@ export default {
     let hpclick = map.on("hotspotclick", function(event) {
       that.createInfoWindow(event);
     });
+
+    /* 从本地导入 */
+    if (this.$store.state.storge.localData) {
+      this.$emit("setLoading", true);
+      let src = this.$store.state.storge.localData;
+      let searchTool = new AMap.PlaceSearch({
+        city: src.city
+      });
+      function importNode(local_node, pre_node, search_tool) {
+        return new Promise((resolve, reject) => {
+          let node = {};
+          node.id = local_node.id;
+          search_tool.getDetails(local_node.id, function(status, result) {
+            node.detail = result.poiList.pois[0];
+            /*create Marker */
+            let marker = new AMap.Marker({
+              map: that.map,
+              position: node.detail.location,
+              animation: "AMAP_ANIMATION_DROP",
+              title: node.detail.name
+            });
+            marker.show();
+            node.marker = marker;
+            /*create transfer */
+            if (local_node.transfer && pre_node) {
+              let poiFrom = pre_node.detail.location;
+              that
+                .createTransferObj(
+                  poiFrom,
+                  node.detail.location,
+                  local_node.transfer.type
+                )
+                .then(result => {
+                  node.transfer = result;
+                  resolve(node);
+                });
+            } else {
+              node.transfer = null;
+              resolve(node);
+            }
+          });
+        });
+      }
+
+      (async function() {
+        for (let i = 0; i < src.POIs.length; i++) {
+          if (i != src.POIs.length - 1) that.$store.commit("addNewDay");
+          for (let j = 0; j < src.POIs[i].length; j++) {
+            let poi_node = await importNode(
+              src.POIs[i][j],
+              j == 0 ? null : that.$store.state.POIs[i][j - 1],
+              searchTool
+            );
+            console.log(poi_node);
+            await that.$store.dispatch({
+              type: "addPOIFromMap",
+              data: poi_node,
+              dayTo: i
+            });
+            if (src.POIs[i][j].transfer && src.POIs[i][j].transfer.index != 0) {
+              let idx = src.POIs[i][j].transfer.index;
+              that.updateTransferIndex(j, idx);
+            }
+          }
+          if (i != src.POIs.length - 1) that.$store.commit("switchDay", i + 1);
+        }
+        that.$store.commit("switchDay", 0);
+        that.$emit("setLoading", false);
+      })();
+    }
+    /*end 导入 */
   },
   methods: {
     /**
@@ -334,7 +394,9 @@ export default {
             outlineColor: "#FFFFFF",
             strokeWeight: 5,
             strokeColor:
-              seg_type == "BUS" ? "#2775b6" : (seg_type == "SUBWAY" ? "#51c4d3" : "#fed71a"),
+              seg_type == "BUS"
+                ? "#2775b6"
+                : seg_type == "SUBWAY" ? "#51c4d3" : "#fed71a",
             showDir: true,
             lineJoin: "round",
             path: plan.segments[i].transit.path
@@ -419,10 +481,11 @@ export default {
         } else if (type === "bus") {
           //bus plan
           transfer.type = "bus";
-          that.$store.state.AMap_Bus.city = that.$store.state.city;
           let kit = new AMap.Transfer(that.$store.state.AMap_Bus);
           transfer.kit = kit;
+          console.log('set');
           kit.search(poiFrom, poiTo, function(statue, result) {
+            console.log('reso');
             if (statue == "complete") {
               transfer.plan = result;
               transfer.routes = that.drawResultOnMap(result, 0, "bus");
@@ -505,6 +568,7 @@ export default {
               type: "addPOIFromMap",
               data: payload
             });
+            that.$emit("setLoading", false); //set loading
           })
           .catch(error => {
             console.log(error);
@@ -516,6 +580,22 @@ export default {
           data: payload
         });
       }
+    },
+    updateTransferIndex:function(itemIndex, transferIndex){
+      let that = this;
+      let result =
+        that.$store.state.POIs[that.$store.state.nowDay][itemIndex].transfer;
+      let newRoutes = that.drawResultOnMap(
+        result.plan,
+        transferIndex,
+        result.type
+      );
+      that.$store.commit({
+        type: "updateTransferIndex",
+        newRoutes: newRoutes,
+        index: itemIndex,
+        transferIndex: transferIndex
+      });
     }
   }
 };
@@ -573,6 +653,6 @@ export default {
   position: absolute;
   left: 20px;
   top: 20px;
-  z-index: 10000;
+  z-index: 1000;
 }
 </style>

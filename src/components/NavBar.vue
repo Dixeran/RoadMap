@@ -3,28 +3,116 @@
     <div id="logo">
       <span>RoadMap</span>
     </div>
-    <ul id="navlist">
+    <ul id="navlist" v-if="!isMobile">
       <router-link to="/">路径规划</router-link>
-      <router-link to="/setting">参数设置</router-link>
+      <router-link to="/abstract">行程概览</router-link>
     </ul>
     <input id="cityName" type="text"
-           v-model="$store.state.city"
-           v-bind:class="$store.state.city == '' ? 'unName' : ''"
-           placeholder="输入城市名">
+      v-if="!isMobile"
+      v-model="$store.state.city"
+      v-bind:class="$store.state.city == '' ? 'unName' : ''"
+      placeholder="输入城市名">
+    <el-popover
+      placement="top-start"
+      trigger="hover"
+      v-if="!isMobile">
+      <el-switch
+        active-text="保存至云端"
+        v-model="$store.state.storge.toCloud"
+        @change="storgeStateChange">
+      </el-switch>
+      <el-button @click="mycode = true" v-if="$store.state.storge.toCloud">生成分享二维码</el-button>
+      <el-button icon="el-icon-upload" circle slot="reference" @click="save" v-loading="loading"></el-button>
+    </el-popover>
+
+    <el-dialog
+      title="登录/注册"
+      :visible.sync="dialogVisible">
+      <User @login="dialogVisible = false"/>
+    </el-dialog>
+
+    <el-dialog
+      title="分享二维码"
+      :visible.sync="mycode"
+      @open="showCode">
+      <canvas id="qrcode"></canvas>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import Qrcode from "qrcode";
+import User from "./User";
 export default {
   name: "Navbar",
-  components: {},
+  components: {
+    User
+  },
   data() {
     return {
-
+      dialogVisible: false,
+      loading: false,
+      mycode: false
     };
   },
   methods: {
-
+    storgeStateChange(new_state) {
+      if (new_state) {
+        //设置上云
+        if (!this.lcs.isLogin()) {
+          this.dialogVisible = true; //未登录，弹窗
+          this.$store.state.storge.toCloud = false;
+        } else {
+          this.login_success();
+        }
+      } else {
+        //取消上云
+        this.$store.state.storge.toCloud = false;
+      }
+    },
+    login_success() {
+      this.$store.state.storge.toCloud = true;
+    },
+    save() {
+      this.loading = true;
+      if (!window.localStorage) {
+        this.$message({
+          message: "保存需要使用localstorge",
+          type: "error"
+        });
+        this.loading = false;
+      } else {
+        localStorage.setItem(
+          "roadmap",
+          JSON.stringify(this.$store.getters.exportData)
+        );
+        console.log(localStorage.getItem("roadmap"));
+        if (this.$store.state.storge.toCloud) {
+          this.lcs
+            .saveToCloud(JSON.stringify(this.$store.getters.exportData))
+            .then(result => {
+              console.log(result);
+              this.loading = false;
+            })
+            .catch(err => {
+              console.log(err);
+              this.loading = false;
+            });
+        } else {
+          this.loading = false;
+        }
+      }
+    },
+    showCode() {
+      let that = this;
+      setTimeout(function() {
+        let canvas = document.getElementById("qrcode");
+        Qrcode.toCanvas(canvas, "https://dixeran.github.io/RoadMap/?type=mobile&email=" + that.lcs.getEmail() + "/", function(error) {
+          if (error) console.error(error);
+          console.log("success!");
+        });
+      }, 100);
+    }
   }
 };
 </script>
@@ -35,6 +123,7 @@ export default {
   height: 60px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding-right: 10px;
   display: flex;
   align-items: center;
   z-index: 10000;
@@ -90,5 +179,11 @@ export default {
 }
 .unName {
   border: 2px solid #f05038 !important;
+}
+
+@media screen and (max-width: 600px) {
+  #Navbar {
+    height: 40px;
+  }
 }
 </style>
