@@ -18,7 +18,7 @@
       v-if="!isMobile">
       <el-switch
         active-text="保存至云端"
-        v-model="$store.state.storge.toCloud"
+        :value="$store.state.storge.toCloud"
         @change="storgeStateChange">
       </el-switch>
       <el-button @click="mycode = true" v-if="$store.state.storge.toCloud">生成分享二维码</el-button>
@@ -28,7 +28,7 @@
     <el-dialog
       title="登录/注册"
       :visible.sync="dialogVisible">
-      <User @login="dialogVisible = false"/>
+      <User @login="dialogVisible = false;login_success()"/>
     </el-dialog>
 
     <el-dialog
