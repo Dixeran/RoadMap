@@ -13,7 +13,10 @@
     </el-row>
     <el-row v-for="(day, n) in $store.state.POIs" :key="n" type="flex" justify="center" class="block">
       <el-col :span="4">
-        <h3 class="text dTitle">Day {{n + 1}}</h3>
+        <el-card class="box-card">
+          <h3 class="text dTitle">Day {{n + 1}}</h3>
+          <p>门票花费：{{getDailyCost(n)}}</p>
+        </el-card>
       </el-col>
       <el-col :span="20">
         <el-table :data="day">
@@ -54,6 +57,18 @@ export default {
       hitokoto: {}
     };
   },
+  methods:{
+    getDailyCost:function(day){
+      day = this.$store.state.POIs[day];
+      let cost = 0;
+      for(let i = 0; i < day.length; i++){
+        if(day[i].detail.deep_type == "SCENIC"){
+          cost += parseFloat(day[i].detail.scenic.price);
+        }
+      }
+      return cost;
+    }
+  },
   computed: {
     mapState: function() {
       return this.$store.state;
@@ -74,7 +89,7 @@ h3 {
 .text {
   color: #333;
 }
-.block{
+.block {
   margin: 3rem 0;
   border-top: dashed 2px #2384b8;
 }
@@ -99,5 +114,9 @@ h3 {
   text-align: center;
   font-size: 2rem;
   margin: 1rem 0;
+}
+
+.box-card{
+  text-align: center;
 }
 </style>
