@@ -250,7 +250,8 @@ export default {
       this.$emit("setLoading", true);
       let src = this.$store.state.storge.localData;
       let searchTool = new AMap.PlaceSearch({
-        city: src.city
+        city: src.city,
+        extensions: 'all'
       });
       function importNode(local_node, pre_node, search_tool) {
         return new Promise((resolve, reject) => {

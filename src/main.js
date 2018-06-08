@@ -26,7 +26,7 @@ if (location.search.indexOf('mobile') < 0) {
     data: function () {
       return {
         isMobile: true,
-        email:hash
+        email: hash
       }
     }
   })

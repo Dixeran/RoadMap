@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import Navbar from "@/components/NavBar";
-import Errorhandler from "@/components/ErrorHandler";
-import Initmodel from "@/components/InitModel";
+import Navbar from "./components/NavBar";
+import Errorhandler from "./components/ErrorHandler";
+import Initmodel from "./components/InitModel";
 export default {
   name: "App",
   components: {
