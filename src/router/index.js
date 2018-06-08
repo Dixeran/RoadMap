@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Checklist from '@/components/CheckList'
-import Roadpage from '@/components/Roadpage'
+import Checklist from '../components/CheckList'
+import Roadpage from '../components/Roadpage'
 
 Vue.use(Router)
 
