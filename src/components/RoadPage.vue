@@ -1,6 +1,7 @@
 <template>
   <div id="Roadpage">
     <Mapcontainer @setLoading="setLoading"
+                  @error="errorHandler"
                   v-loading.fullscreen.lock="loading"/>
     <Daytransmit v-if="onDrag" @moveTo="moveTo"/>
     <Detailpath v-if="!isMobile"
@@ -93,6 +94,9 @@ export default {
      */
     setLoading: function(state) {
       this.loading = state;
+    },
+    errorHandler(error){
+      this.$emit('error', error);
     }
   }
 };

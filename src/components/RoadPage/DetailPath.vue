@@ -30,7 +30,7 @@
               <div class="cd-select-group" slot="selector">
                 <select name="cd-method" class="cd-select"
                         :value="item.transfer.type"
-                        @change="updateTransferPlan($event, index)">
+                        @change.prevent="updateTransferPlan($event, index)">
                   <option v-for="option in transPlan" v-bind:value="option.data" :key="option.data">
                     {{option.name}}
                   </option>
@@ -103,8 +103,14 @@ export default {
   },
   methods: {
     updateTransferPlan:function(e, index){
+      console.log(e);
       let val = e.target.value;
+      e.target.value = e.target._value;
       this.$emit('updateTransferPlan', index, val);
+    },
+    handleInput(e){
+      console.log(e);
+      e.target.value = e.target._value;
     }
   },
   updated: function() {

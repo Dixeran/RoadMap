@@ -6,7 +6,7 @@
       <Errorhandler @click.native="errorConfirmed" v-if="error != ''" :errorData="error"/>
     </transition>
     <keep-alive include="Roadpage" @error="HandleError" v-if="init">
-      <router-view></router-view>
+      <router-view @error="HandleError"></router-view>
     </keep-alive>
   </div>
 </template>

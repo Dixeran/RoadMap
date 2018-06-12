@@ -40,6 +40,8 @@ export default {
           newTransfer: newTransfer,
           index: itemIndex
         });
+      }).catch(err=>{
+        that.$emit('error', err);
       });
     });
 
@@ -479,20 +481,20 @@ export default {
               reject();
             }
           });
-        } else if (type === "bus") {
+        } else if (type === "bus") {//TODO:判断是否有data
           //bus plan
           transfer.type = "bus";
           let kit = new AMap.Transfer(that.$store.state.AMap_Bus);
           transfer.kit = kit;
-          console.log('set');
           kit.search(poiFrom, poiTo, function(statue, result) {
-            console.log('reso');
-            if (statue == "complete") {
+            if (statue == "complete" && result.info != "NO_DATA") {
               transfer.plan = result;
+              console.log(result);
+              console.log(statue);
               transfer.routes = that.drawResultOnMap(result, 0, "bus");
               resolve(transfer);
             } else {
-              reject(result);
+              reject('无对应方案数据');
             }
           });
         } else if (type === "ride") {
