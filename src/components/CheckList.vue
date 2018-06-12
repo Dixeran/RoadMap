@@ -62,7 +62,7 @@ export default {
       day = this.$store.state.POIs[day];
       let cost = 0;
       for(let i = 0; i < day.length; i++){
-        if(day[i].detail.deep_type == "SCENIC"){
+        if(day[i].detail.deep_type == "SCENIC" && day[i].detail.scenic.price){
           cost += parseFloat(day[i].detail.scenic.price);
         }
       }
